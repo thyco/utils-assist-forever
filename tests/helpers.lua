@@ -99,7 +99,11 @@ function Helpers.new()
         local value = { scripts = {}, events = {}, shown = true, width = 580, kind = kind, parent = parent,
             template = template, children = {}, color = { 1, 1, 1, 1 }, desaturation = 0, writes = 0,
             mouseEnabled = true, mouseWrites = 0, textureWrites = 0 }
-        function value:SetPoint(...) self.point = { ... } end
+        function value:SetPoint(...)
+            self.point = { ... }
+            self.points = self.points or {}
+            self.points[#self.points + 1] = self.point
+        end
         function value:SetSize(width, height) self.width = width; self.height = height end
         function value:SetWidth(width) self.width = width end
         function value:GetWidth() return self.width end
@@ -126,7 +130,7 @@ function Helpers.new()
         function value:GetTexture() return self.texture end
         function value:SetAllPoints() end
         function value:SetScrollChild(child) self.scrollChild = child end
-        function value:ClearAllPoints() self.point = nil end
+        function value:ClearAllPoints() self.point = nil; self.points = {} end
         function value:SetMovable(movable) self.movable = movable end
         function value:SetClampedToScreen(clamped) self.clamped = clamped end
         function value:EnableMouse(enabled)

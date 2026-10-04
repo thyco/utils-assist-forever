@@ -27,18 +27,30 @@ function panel:Initialize()
     local widgets = addon.SettingsWidgets
     local canvas = CreateFrame("Frame")
     self.canvas = canvas
-    canvas:SetHeight(720)
     canvas:Hide()
     self.category = Settings.RegisterCanvasLayoutCategory(canvas, "Utils Assist Forever")
 
-    widgets.Text(canvas, "Utils Assist Forever", 8, -8, "GameFontNormalLarge")
-    local range = widgets.Section(canvas, "Range checks", "All classes · all eight default action bars", -48, 146)
+    local scroll = CreateFrame("ScrollFrame", nil, canvas, "ScrollFrameTemplate")
+    self.scroll = scroll
+    scroll:SetPoint("TOPLEFT", canvas, "TOPLEFT", 0, 0)
+    scroll:SetPoint("BOTTOMRIGHT", canvas, "BOTTOMRIGHT", -28, 0)
+
+    local content = CreateFrame("Frame", nil, scroll)
+    self.content = content
+    content:SetSize(math.max(scroll:GetWidth(), 1), 704)
+    scroll:SetScrollChild(content)
+    scroll:SetScript("OnSizeChanged", function(_, width)
+        content:SetWidth(math.max(width, 1))
+    end)
+
+    widgets.Text(content, "Utils Assist Forever", 8, -8, "GameFontNormalLarge")
+    local range = widgets.Section(content, "Range checks", "All classes · all eight default action bars", -48, 146)
     self.sections = { range }
     local rangeTip = "Tint these abilities when your living attackable target is out of range. With no target selected, checks your mouseover."
     checkbox(range, "checkRangedAbilities", "Check ranged abilities", -62, rangeTip)
     checkbox(range, "checkMeleeAbilities", "Check melee abilities", -96, rangeTip)
 
-    local cooldown = widgets.Section(canvas, "Cooldown greying", "Action icons on cooldown or unusable", -210, 248)
+    local cooldown = widgets.Section(content, "Cooldown greying", "Action icons on cooldown or unusable", -210, 248)
     self.sections[#self.sections + 1] = cooldown
     checkbox(cooldown, "greyOnCooldown", "Grey actions on cooldown", -62,
         "Desaturate action icons on a real cooldown. The global cooldown is ignored.")
@@ -49,7 +61,7 @@ function panel:Initialize()
     checkbox(cooldown, "greyPetActions", "Grey pet actions", -164,
         "Include Blizzard pet action buttons in cooldown and unusable checks.")
 
-    local click = widgets.Section(canvas, "Action bar click-through",
+    local click = widgets.Section(content, "Action bar click-through",
         "Mouse clicks pass through selected bars; key bindings still work", -474, 210)
     self.sections[#self.sections + 1] = click
     for index = 1, 8 do
@@ -61,6 +73,7 @@ function panel:Initialize()
     end
 
     canvas:SetScript("OnShow", function()
+        content:SetWidth(math.max(scroll:GetWidth(), 1))
         self:Refresh()
     end)
     addon.Config.Subscribe(function()

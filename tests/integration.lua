@@ -277,6 +277,32 @@ test('range checkbox remains inside its own settings section', function()
     equal(panel.sections[3].children[1].text, 'Action bar click-through')
 end)
 
+test('settings groups live inside a bounded scroll viewport', function()
+    local _, addon = setup()
+    local panel = addon.SettingsPanel
+    local scroll = panel.scroll
+
+    equal(scroll.kind, 'ScrollFrame')
+    equal(scroll.template, 'ScrollFrameTemplate')
+    equal(scroll.parent, panel.canvas)
+    equal(scroll.scrollChild, panel.content)
+    equal(panel.content.parent, scroll)
+    equal(panel.content.height, 704)
+    equal(panel.sections[1].parent, panel.content)
+    equal(panel.sections[3].parent, panel.content)
+    equal(scroll.points[1][1], 'TOPLEFT')
+    equal(scroll.points[2][1], 'BOTTOMRIGHT')
+
+    scroll.scripts.OnSizeChanged(scroll, 440, 400)
+
+    equal(panel.content.width, 440)
+
+    scroll:SetWidth(380)
+    panel.canvas:Show()
+
+    equal(panel.content.width, 380)
+end)
+
 test('slash config command opens registered native category', function()
     local world = setup()
 
