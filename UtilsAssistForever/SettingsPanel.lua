@@ -43,7 +43,13 @@ function panel:Initialize()
         content:SetWidth(math.max(width, 1))
     end)
 
-    widgets.Text(content, "Utils Assist Forever", 8, -8, "GameFontNormalLarge")
+    local icon = content:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(32, 32)
+    icon:SetPoint("TOPLEFT", content, "TOPLEFT", 8, -6)
+    icon:SetTexture("Interface\\AddOns\\UtilsAssistForever\\Media\\icon.tga")
+    self.icon = icon
+
+    widgets.Text(content, "Utils Assist Forever", 48, -8, "GameFontNormalLarge")
     local range = widgets.Section(content, "Range checks", "All classes · all eight default action bars", -48, 146)
     self.sections = { range }
     local rangeTip = "Tint these abilities when your living attackable target is out of range. With no target selected, checks your mouseover."

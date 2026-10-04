@@ -303,6 +303,21 @@ test('settings groups live inside a bounded scroll viewport', function()
     equal(panel.content.width, 380)
 end)
 
+test('addon icon appears in the manifest and settings header', function()
+    local _, addon = setup()
+    local iconPath = 'Interface\\AddOns\\UtilsAssistForever\\Media\\icon.tga'
+    local file = assert(io.open('UtilsAssistForever/UtilsAssistForever.toc'))
+    local manifest = file:read('*a')
+    file:close()
+
+    assert(manifest:find('## IconTexture: ' .. iconPath, 1, true))
+    equal(addon.SettingsPanel.icon:GetTexture(), iconPath)
+
+    local icon = assert(io.open('UtilsAssistForever/Media/icon.tga', 'rb'))
+    assert(icon:read(1), 'addon icon is empty')
+    icon:close()
+end)
+
 test('slash config command opens registered native category', function()
     local world = setup()
 

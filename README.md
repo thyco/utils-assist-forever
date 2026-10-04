@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. Supports every class and all eight default Blizzard action bars. Version 0.3.1 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. Supports every class and all eight default Blizzard action bars. Version 0.3.2 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.3.1.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.3.2.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -17,6 +17,8 @@ Enable **Utils Assist Forever** in the AddOns menu. Remove the old Range Assist 
 Open **Settings → AddOns → Utils Assist Forever**, or `/uaf config`.
 
 The settings groups sit in a scrollable pane, so the lower click-through controls remain reachable even in a smaller Settings window.
+
+The spanner-and-gear icon appears in the AddOns list and beside the settings title.
 
 The **Range checks** group contains two checkboxes, both enabled by default:
 

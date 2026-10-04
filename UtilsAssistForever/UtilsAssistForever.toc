@@ -2,7 +2,8 @@
 ## Title: Utils Assist Forever
 ## Notes: Range, cooldown and action-bar click-through utilities for WoW Forever.
 ## Author: Utils Assist Forever
-## Version: 0.3.1
+## Version: 0.3.2
+## IconTexture: Interface\AddOns\UtilsAssistForever\Media\icon.tga
 ## SavedVariablesPerCharacter: UtilsAssistForeverDB
 
 Core.lua
