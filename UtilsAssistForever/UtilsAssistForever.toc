@@ -1,0 +1,19 @@
+## Interface: 16001
+## Title: Utils Assist Forever
+## Notes: Independent utility features for WoW Forever, starting with action-bar range checks.
+## Author: Utils Assist Forever
+## Version: 0.1.0
+## SavedVariablesPerCharacter: UtilsAssistForeverDB
+
+Core.lua
+Services/Config.lua
+Services/Client.lua
+Services/Macros.lua
+Services/NextSwing.lua
+Services/Range.lua
+Services/Buttons.lua
+Services/IconTint.lua
+Features/RangeCheck.lua
+Services/SettingsWidgets.lua
+SettingsPanel.lua
+Bootstrap.lua

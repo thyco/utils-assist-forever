@@ -1,0 +1,44 @@
+local addonName, addon = ...
+addon.name = addonName
+addon.version = "0.1.0"
+addon.features = {}
+addon.started = false
+addon.running = false
+
+function addon:RegisterFeature(feature)
+    self.features[#self.features + 1] = feature
+end
+
+function addon:Start()
+    if self.started then
+        return
+    end
+
+    self.started = true
+    self.Config.Subscribe(function()
+        self:ApplySettings()
+    end)
+    self:ApplySettings()
+end
+
+function addon:ApplySettings()
+    self.running = self.Config.Get("checkRangedAbilities") or self.Config.Get("checkMeleeAbilities")
+    self:SetPolling(self.running)
+    if self.running then
+        self:Refresh(true, true)
+    else
+        for _, feature in ipairs(self.features) do
+            feature:Stop()
+        end
+    end
+end
+
+function addon:Refresh(discover, rebuild)
+    if not self.started or not self.running then
+        return
+    end
+
+    for _, feature in ipairs(self.features) do
+        feature:Refresh(discover, rebuild)
+    end
+end
