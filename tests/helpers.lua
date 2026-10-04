@@ -97,7 +97,8 @@ function Helpers.new()
 
     local function frame(kind, name, parent, template)
         local value = { scripts = {}, events = {}, shown = true, width = 580, kind = kind, parent = parent,
-            template = template, children = {}, color = { 1, 1, 1, 1 }, desaturation = 0, writes = 0 }
+            template = template, children = {}, color = { 1, 1, 1, 1 }, desaturation = 0, writes = 0,
+            mouseEnabled = true, mouseWrites = 0, textureWrites = 0 }
         function value:SetPoint(...) self.point = { ... } end
         function value:SetSize(width, height) self.width = width; self.height = height end
         function value:SetWidth(width) self.width = width end
@@ -121,13 +122,18 @@ function Helpers.new()
         function value:UnregisterAllEvents() self.events = {} end
         function value:CreateFontString() return frame('FontString', nil, self) end
         function value:CreateTexture() return frame('Texture', nil, self) end
-        function value:SetTexture(texture) self.texture = texture end
+        function value:SetTexture(texture) self.texture = texture; self.textureWrites = self.textureWrites + 1 end
+        function value:GetTexture() return self.texture end
         function value:SetAllPoints() end
         function value:SetScrollChild(child) self.scrollChild = child end
         function value:ClearAllPoints() self.point = nil end
         function value:SetMovable(movable) self.movable = movable end
         function value:SetClampedToScreen(clamped) self.clamped = clamped end
-        function value:EnableMouse(enabled) self.mouseEnabled = enabled end
+        function value:EnableMouse(enabled)
+            self.mouseEnabled = enabled
+            self.mouseWrites = self.mouseWrites + 1
+        end
+        function value:IsMouseEnabled() return self.mouseEnabled end
         function value:RegisterForDrag(...) self.dragButtons = { ... } end
         function value:StartMoving() self.moving = true end
         function value:StopMovingOrSizing() self.moving = false end

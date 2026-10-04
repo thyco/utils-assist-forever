@@ -26,6 +26,11 @@ def main():
                 raise SystemExit(f"Invalid or missing manifest entry: {entry}")
             files.append(source)
 
+    notice = ADDON / "THIRD_PARTY.txt"
+    if not notice.is_file():
+        raise SystemExit("Missing third-party attribution")
+    files.append(notice)
+
     for asset in sorted((ADDON / "Media").rglob("*")):
         if asset.is_file():
             source = asset.resolve()

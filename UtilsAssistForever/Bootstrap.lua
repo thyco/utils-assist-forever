@@ -48,6 +48,7 @@ frame:SetScript("OnEvent", function(self, event)
         self:RegisterEvent("PLAYER_TARGET_CHANGED")
         self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        self:RegisterEvent("PLAYER_REGEN_DISABLED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("SPELLS_CHANGED")
         self:RegisterEvent("PLAYER_TALENT_UPDATE")
@@ -66,9 +67,17 @@ frame:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_TARGET_CHANGED" or event == "UPDATE_MOUSEOVER_UNIT" then
         addon:Refresh(false, catalogDirty)
         catalogDirty = false
-    elseif event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTERING_WORLD" then
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        addon.BarClickThrough:OnCombatEnd()
         addon:Refresh(true, true)
         discoveryDirty, catalogDirty = false, false
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        addon:Refresh(true, true)
+        discoveryDirty, catalogDirty = false, false
+    elseif event == "PLAYER_REGEN_DISABLED" then
+        if addon.BarClickThrough:Enabled() then
+            addon.BarClickThrough:Refresh(false)
+        end
     elseif event == "UPDATE_MACROS" then
         catalogDirty, discoveryDirty = true, true
     elseif event == "SPELLS_CHANGED" or event == "PLAYER_TALENT_UPDATE"
@@ -94,6 +103,10 @@ SlashCmdList.UTILSASSISTFOREVER = function(message)
         return
     end
 
+    if addon.BarClickThrough:Command(message) then
+        return
+    end
+
     addon:Refresh(true, true)
     print("Utils Assist Forever " .. addon.version .. " | /uaf config to configure")
     print("Ranged: " .. (addon.Config.Get("checkRangedAbilities") and "enabled" or "disabled")
@@ -102,6 +115,13 @@ SlashCmdList.UTILSASSISTFOREVER = function(message)
         .. " | out-of-range buttons: " .. addon.RangeCheck.colored)
     print("Cooldown greying: " .. (addon.Config.Get("greyOnCooldown") and "enabled" or "disabled")
         .. " | greyed buttons: " .. addon.CooldownGrey.greyed)
+    local clickThrough = {}
+    for index = 1, 8 do
+        if addon.Config.Get("clickThroughBar" .. index) then
+            clickThrough[#clickThrough + 1] = index
+        end
+    end
+    print("Click-through bars: " .. (#clickThrough > 0 and table.concat(clickThrough, ", ") or "none"))
     if addon.RangeCheck:Enabled() then
         for _, line in ipairs(addon.RangeCheck.references) do
             print(line)
@@ -109,5 +129,13 @@ SlashCmdList.UTILSASSISTFOREVER = function(message)
         for _, line in ipairs(addon.Range:DescribeChecks()) do
             print(line)
         end
+    end
+end
+
+SLASH_BNC1 = "/bnc"
+SLASH_BNC2 = "/barnoclicky"
+SlashCmdList.BNC = function(message)
+    if not addon.BarClickThrough:Command(message) then
+        addon.BarClickThrough:Help()
     end
 end

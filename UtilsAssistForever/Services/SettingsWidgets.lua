@@ -43,9 +43,9 @@ function Widgets.Section(parent, title, description, y, height)
     return section
 end
 
-function Widgets.Checkbox(parent, label, y, setting, tooltip)
+function Widgets.Checkbox(parent, label, y, setting, tooltip, x)
     local check = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    check:SetPoint("TOPLEFT", parent, "TOPLEFT", 12, y)
+    check:SetPoint("TOPLEFT", parent, "TOPLEFT", x or 12, y)
     check.Text:SetText(label)
     check.Text:SetFontObject("GameFontHighlight")
     check:SetScript("OnClick", function(self)
@@ -58,4 +58,3 @@ function Widgets.Checkbox(parent, label, y, setting, tooltip)
 
     return check
 end
-

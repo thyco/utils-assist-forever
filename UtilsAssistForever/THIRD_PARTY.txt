@@ -1,0 +1,14 @@
+Utils Assist Forever incorporates behavior adapted from:
+
+GreyOnCooldown 2.0.2
+Author: Millán - Sanguino
+Source provided as GreyOnCooldown-2.0.2.zip
+License: GNU General Public License, version 3
+
+BarNoClicky 1.0.6
+Author: mostlyharmlessx
+Source provided as BarNoClicky_1_0_6.zip
+License: GNU General Public License, version 3
+
+The full license text is included in LICENSE.txt. The integrations use
+Utils Assist Forever's per-character settings and feature framework.

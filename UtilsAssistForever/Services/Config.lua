@@ -9,6 +9,9 @@ local defaults = {
     greyWithoutResources = false,
     greyPetActions = true,
 }
+for index = 1, 8 do
+    defaults["clickThroughBar" .. index] = false
+end
 local values
 local listeners = {}
 

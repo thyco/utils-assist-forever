@@ -2,7 +2,7 @@ local _, addon = ...
 local panel = { controls = {}, sections = {} }
 addon.SettingsPanel = panel
 
-local function checkbox(section, key, label, y, tooltip)
+local function checkbox(section, key, label, y, tooltip, x)
     local setting = Settings.RegisterProxySetting(panel.category, "UtilsAssistForever_" .. key,
         Settings.VarType.Boolean, label, addon.Config.GetDefault(key), function()
             return addon.Config.Get(key)
@@ -10,7 +10,7 @@ local function checkbox(section, key, label, y, tooltip)
             addon.Config.Set(key, value)
         end)
 
-    panel.controls[key] = addon.SettingsWidgets.Checkbox(section, label, y, setting, tooltip)
+    panel.controls[key] = addon.SettingsWidgets.Checkbox(section, label, y, setting, tooltip, x)
 end
 
 function panel:Refresh()
@@ -27,7 +27,7 @@ function panel:Initialize()
     local widgets = addon.SettingsWidgets
     local canvas = CreateFrame("Frame")
     self.canvas = canvas
-    canvas:SetHeight(520)
+    canvas:SetHeight(720)
     canvas:Hide()
     self.category = Settings.RegisterCanvasLayoutCategory(canvas, "Utils Assist Forever")
 
@@ -48,6 +48,17 @@ function panel:Initialize()
         "Also desaturate actions when WoW reports insufficient mana, rage, energy or another resource.")
     checkbox(cooldown, "greyPetActions", "Grey pet actions", -164,
         "Include Blizzard pet action buttons in cooldown and unusable checks.")
+
+    local click = widgets.Section(canvas, "Action bar click-through",
+        "Mouse clicks pass through selected bars; key bindings still work", -474, 210)
+    self.sections[#self.sections + 1] = click
+    for index = 1, 8 do
+        local column = index > 4 and 1 or 0
+        local row = (index - 1) % 4
+        checkbox(click, "clickThroughBar" .. index, "Bar " .. index .. " click-through",
+            -62 - row * 34, "Disable mouse clicks on this default action bar. Changes made in combat apply when combat ends.",
+            12 + column * 270)
+    end
 
     canvas:SetScript("OnShow", function()
         self:Refresh()

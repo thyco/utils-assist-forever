@@ -6,15 +6,30 @@ local prefixes = {
     "MultiBarRightButton", "MultiBarLeftButton", "MultiBar5Button",
     "MultiBar6Button", "MultiBar7Button",
 }
+Buttons.BarPrefixes = prefixes
+
+function Buttons.Bar(index)
+    local buttons = {}
+    local prefix = prefixes[index]
+    if not prefix then
+        return buttons
+    end
+
+    for buttonIndex = 1, 12 do
+        local button = _G[prefix .. buttonIndex]
+        if button then
+            buttons[#buttons + 1] = button
+        end
+    end
+
+    return buttons
+end
 
 function Buttons.All()
     local buttons = {}
-    for _, prefix in ipairs(prefixes) do
-        for index = 1, 12 do
-            local button = _G[prefix .. index]
-            if button then
-                buttons[#buttons + 1] = button
-            end
+    for barIndex = 1, #prefixes do
+        for _, button in ipairs(Buttons.Bar(barIndex)) do
+            buttons[#buttons + 1] = button
         end
     end
 

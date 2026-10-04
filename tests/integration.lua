@@ -266,13 +266,15 @@ test('range checkbox remains inside its own settings section', function()
     local count = 0
     for _ in pairs(panel.controls) do count = count + 1 end
 
-    equal(count, 6)
-    equal(#panel.sections, 2)
+    equal(count, 14)
+    equal(#panel.sections, 3)
     equal(panel.controls.checkRangedAbilities.Text.text, 'Check ranged abilities')
     equal(panel.controls.checkRangedAbilities.parent, panel.sections[1])
     equal(panel.sections[1].children[1].text, 'Range checks')
     equal(panel.controls.greyOnCooldown.parent, panel.sections[2])
     equal(panel.sections[2].children[1].text, 'Cooldown greying')
+    equal(panel.controls.clickThroughBar1.parent, panel.sections[3])
+    equal(panel.sections[3].children[1].text, 'Action bar click-through')
 end)
 
 test('slash config command opens registered native category', function()
