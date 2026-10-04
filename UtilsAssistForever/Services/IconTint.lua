@@ -121,7 +121,8 @@ function IconTint.SetCooldown(button, active)
     end
 
     if record.cooldownActive == enabled and (not enabled
-        or addon.Client.Readable(amount) and record.cooldownAmount == amount) then
+        or addon.Client.Readable(amount) and addon.Client.Readable(record.cooldownAmount)
+        and record.cooldownAmount == amount) then
         return
     end
 

@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. Supports every class and all eight default Blizzard action bars. Version 0.3.2 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. Supports every class and all eight default Blizzard action bars. Version 0.3.3 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.3.2.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.3.3.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -44,7 +44,7 @@ Use `/uaf config` to change bars, `/uaf clicky 1-8|all` or `/uaf noclicky 1-8|al
 
 ## Cooldown greying
 
-Cooldown greying adapts the behavior of **GreyOnCooldown 2.0.2** by Millán - Sanguino to the Utils Assist Forever settings and icon handling. It checks Blizzard's eight default action bars, extra/override/stance/possess and flyout buttons, Blizzard pet buttons, LibActionButton buttons, Dominos registered buttons, and Bartender4 pet buttons. It uses action cooldown and usability APIs when available, including duration objects on newer clients. An explicit global cooldown is ignored; older APIs use the active global cooldown or a conservative short-duration threshold. Unknown or restricted results leave the native icon unchanged. The addon polls while enabled and refreshes on cooldown and usability events, so updates do not depend on another addon loading first.
+Cooldown greying adapts the behavior of **GreyOnCooldown 2.0.2** by Millán - Sanguino to the Utils Assist Forever settings and icon handling. It checks Blizzard's eight default action bars, extra/override/stance/possess and flyout buttons, Blizzard pet buttons, LibActionButton buttons, Dominos registered buttons, and Bartender4 pet buttons. It uses action cooldown and usability APIs when available, including duration objects on newer clients. An explicit global cooldown is ignored; older APIs use the active global cooldown or a conservative short-duration threshold. Unknown or restricted results leave the native icon unchanged. Opaque cooldown curve values are passed through to the icon without comparing them, including when a later update becomes readable. The addon polls while enabled and refreshes on cooldown and usability events, so updates do not depend on another addon loading first.
 
 When both features affect a button, the red range tint takes priority; when range becomes valid, an active cooldown remains grey. The latest native color, alpha and desaturation are restored when both effects clear. Cooldown greying is independent of having a selected target. Pet greying follows its own checkbox and skips short global cooldowns.
 

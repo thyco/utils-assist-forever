@@ -126,6 +126,37 @@ test('opaque curve result is reapplied without comparing it', function()
     equal(world.main.icon.writes > writes, true)
 end)
 
+test('opaque cooldown is checked before comparing it with a readable update', function()
+    local world, addon = setup(function(w)
+        w.cooldowns[1] = { isOnGCD = false, isEnabled = true }
+        w.env.Enum.LuaCurveType = { Step = 'step' }
+        w.env.C_CurveUtil = { CreateCurve = function()
+            return { SetType = function() end, AddPoint = function() end }
+        end }
+        w.env.C_ActionBar.GetActionCooldownDuration = function()
+            return {
+                HasSecretValues = function() return true end,
+                EvaluateRemainingDuration = function() return w.secret end,
+            }
+        end
+    end)
+    local readable = addon.Client.Readable
+    local checkedStoredValue = false
+    addon.Client.Readable = function(value)
+        if rawequal(value, world.secret) then
+            checkedStoredValue = true
+        end
+
+        return readable(value)
+    end
+
+    world.usable[1] = { false, false }
+    world:tick(0.1)
+
+    equal(checkedStoredValue, true, 'stored opaque amount must be guarded')
+    grey(world.main)
+end)
+
 test('restricted cooldown without a safe duration leaves native appearance', function()
     local world = setup(function(w)
         w.env.C_ActionBar.GetActionCooldown = function() return w.secret end
