@@ -1,27 +1,42 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Its first feature is a range check that tints spell icons **desaturated red when WoW explicitly reports them out of range**, whether too close or too far. Supports every class and all eight default Blizzard action bars. Version 0.1.0 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Supports every class and all eight default Blizzard action bars. Version 0.2.0 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.1.0.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.2.0.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
 ```
 
-Enable **Utils Assist Forever** in the AddOns menu. Replace the old Range Assist Forever folder rather than loading both addons together: each would otherwise inspect and color the same buttons. The old repository remains untouched. Restart the client if the newly installed addon does not appear.
+Enable **Utils Assist Forever** in the AddOns menu. Remove the old Range Assist Forever and GreyOnCooldown folders when switching to this combined addon, so only one addon manages each icon. The old repositories remain untouched. Restart the client if the newly installed addon does not appear.
 
 ## Settings
 
 Open **Settings → AddOns → Utils Assist Forever**, or `/uaf config`.
 
-The **Range checks** group contains exactly two checkboxes, both enabled by default:
+The **Range checks** group contains two checkboxes, both enabled by default:
 
 - **Check ranged abilities**
 - **Check melee abilities**
 
-Preferences are saved separately for each character in `UtilsAssistForeverDB`. Existing Range Assist Forever settings are not imported; each character starts with both checks enabled. Changes apply immediately; disabling both stops polling and restores icons. Each checkbox affects only its category.
+The **Cooldown greying** group contains four checkboxes:
+
+- **Grey actions on cooldown** — enabled by default; skips the global cooldown.
+- **Grey unusable actions** — enabled by default.
+- **Grey actions without resources** — disabled by default; extends unusable greying to insufficient resources.
+- **Grey pet actions** — enabled by default.
+
+Preferences are saved separately for each character in `UtilsAssistForeverDB`. Existing Range Assist Forever and GreyOnCooldown settings are not imported; each character starts with the defaults above. Changes apply immediately; disabling both range checks and cooldown greying stops polling and restores icons. Each checkbox affects only its category.
+
+## Cooldown greying
+
+Cooldown greying adapts the behavior of **GreyOnCooldown 2.0.2** by Millán - Sanguino to the Utils Assist Forever settings and icon handling. It checks Blizzard's eight default action bars, extra/override/stance/possess and flyout buttons, Blizzard pet buttons, LibActionButton buttons, Dominos registered buttons, and Bartender4 pet buttons. It uses action cooldown and usability APIs when available, including duration objects on newer clients. An explicit global cooldown is ignored; older APIs use the active global cooldown or a conservative short-duration threshold. Unknown or restricted results leave the native icon unchanged. The addon polls while enabled and refreshes on cooldown and usability events, so updates do not depend on another addon loading first.
+
+When both features affect a button, the red range tint takes priority; when range becomes valid, an active cooldown remains grey. The latest native color, alpha and desaturation are restored when both effects clear. Cooldown greying is independent of having a selected target. Pet greying follows its own checkbox and skips short global cooldowns.
+
+The integration uses the attached addon's behavior without its Ace3 libraries, account-wide profiles, addon compartment entry, or separate slash commands. This distribution includes the GPL-3.0 license from the source addon in `LICENSE.txt`.
 
 The melee category includes learned harmful spells whose minimum range is zero and maximum range is at most 5 yards, including zero/zero melee candidates. Other valid learned harmful spells use the ranged setting. This is range-based grouping, not weapon type or class: caster attacks with no minimum range still count as ranged. A spell reported above 5 yards uses the ranged setting even if its combat role is melee. See [classification investigation](docs/design.md) for findings and limitations.
 
@@ -72,16 +87,17 @@ Run `/uaf` for the current unit, enabled categories, button counts, each checked
 
 ## Development
 
-The range feature, secure icon hooks, API test doubles and manifest-based ZIP packaging were migrated from Range Assist Forever. The addon namespace, settings, command, and package now belong to Utils Assist Forever. The feature registry in `Core.lua` permits later utility features; only range checks are present today.
+The range feature, secure icon hooks, API test doubles and manifest-based ZIP packaging were migrated from Range Assist Forever. The cooldown feature is adapted from GreyOnCooldown 2.0.2. Both features share icon appearance handling, while retaining separate settings and checks.
 
 ```sh
 lua tests/run.lua
 lua tests/integration.lua
 lua tests/next_swing.lua
+lua tests/cooldown.lua
 python3 scripts/package.py
 ```
 
-Lua tests require Lua 5.4; packaging requires Python 3.9+. The addon itself uses WoW-compatible Lua syntax. Polling runs every 0.1 seconds; default-button discovery runs every 0.5 seconds and on relevant bar events. Duplicate spell buttons share one query per refresh. No range queries run without an eligible unit.
+Lua tests require Lua 5.4; packaging requires Python 3.9+. The addon itself uses WoW-compatible Lua syntax. Polling runs every 0.1 seconds; button discovery runs every 0.5 seconds and on relevant bar events. Duplicate spell buttons share one range query per refresh. No range queries run without an eligible unit.
 
 ## In-game acceptance
 
@@ -94,5 +110,6 @@ Local tests cannot establish actual Forever spell metadata, rendering or secure 
 5. Test all eight bars, paging, moved abilities, hidden bars and displayed-spell macros.
 6. Check target priority, target clearing, enemy mouseover arrival/departure, and selected friendly/dead targets blocking mouseover fallback.
 7. Repeat in combat and watch for Lua errors or blocked-action messages. Verify unknown/restricted range checks restore the native icon.
+8. Test a real cooldown, a global cooldown, an unusable action, insufficient resources, and a pet action. Toggle each cooldown setting and confirm normal icon color returns after the cooldown. Check a spell that is both out of range and on cooldown: it should be red first, then grey when range becomes valid.
 
 For the new reference check, put Raptor Strike or Heroic Strike on a bar directly and in a uniquely named combined macro. Run `/uaf` near and far from an enemy, before and after queuing the attack. Confirm diagnostics show `Wing Clip reference` on a hunter or `Hamstring reference` on a warrior (localized on other clients) and, for the combined macro, `macro body`. Repeat in combat and with no selected target plus an enemy mouseover. Edit the macro and verify detection refreshes. If the selected reference is unavailable or does not change with distance, send the `/uaf` output; icons intentionally remain native when the result is unknown.

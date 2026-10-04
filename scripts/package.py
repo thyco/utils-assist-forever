@@ -42,17 +42,22 @@ def main():
             if source not in files:
                 files.append(source)
 
+    license_file = ROOT / "LICENSE.txt"
+    if not license_file.is_file():
+        raise SystemExit("Missing GPL-3.0 license")
+
     destination = ROOT / "dist" / f"UtilsAssistForever-{version[1]}.zip"
     destination.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED) as archive:
         for source in files:
             archive.write(source, source.relative_to(ROOT))
+        archive.write(license_file, "UtilsAssistForever/LICENSE.txt")
 
     with zipfile.ZipFile(destination) as archive:
-        if archive.testzip() is not None or len(archive.namelist()) != len(files):
+        if archive.testzip() is not None or len(archive.namelist()) != len(files) + 1:
             raise SystemExit("Archive verification failed")
 
-    print(f"Built {destination} ({len(files)} files)")
+    print(f"Built {destination} ({len(files) + 1} files)")
 
 
 if __name__ == "__main__":

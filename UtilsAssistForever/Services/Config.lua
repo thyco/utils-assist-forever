@@ -1,7 +1,14 @@
 local _, addon = ...
 local Config = {}
 addon.Config = Config
-local defaults = { checkRangedAbilities = true, checkMeleeAbilities = true }
+local defaults = {
+    checkRangedAbilities = true,
+    checkMeleeAbilities = true,
+    greyOnCooldown = true,
+    greyUnusableActions = true,
+    greyWithoutResources = false,
+    greyPetActions = true,
+}
 local values
 local listeners = {}
 

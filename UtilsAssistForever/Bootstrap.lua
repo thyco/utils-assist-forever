@@ -53,6 +53,13 @@ frame:SetScript("OnEvent", function(self, event)
         self:RegisterEvent("PLAYER_TALENT_UPDATE")
         self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
         self:RegisterEvent("SPELL_DATA_LOAD_RESULT")
+        self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
+        self:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
+        self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+        self:RegisterEvent("SPELL_UPDATE_USABLE")
+        self:RegisterEvent("BAG_UPDATE_COOLDOWN")
+        self:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
+        self:RegisterEvent("PET_BAR_UPDATE_USABLE")
         return
     end
 
@@ -67,6 +74,13 @@ frame:SetScript("OnEvent", function(self, event)
     elseif event == "SPELLS_CHANGED" or event == "PLAYER_TALENT_UPDATE"
         or event == "UPDATE_SHAPESHIFT_FORM" or event == "SPELL_DATA_LOAD_RESULT" then
         catalogDirty = true
+    elseif event == "ACTIONBAR_UPDATE_COOLDOWN" or event == "ACTIONBAR_UPDATE_USABLE"
+        or event == "SPELL_UPDATE_COOLDOWN" or event == "SPELL_UPDATE_USABLE"
+        or event == "BAG_UPDATE_COOLDOWN" or event == "PET_BAR_UPDATE_COOLDOWN"
+        or event == "PET_BAR_UPDATE_USABLE" then
+        if addon.CooldownGrey:Enabled() then
+            addon.CooldownGrey:Refresh(false)
+        end
     else
         discoveryDirty = true
     end
@@ -86,7 +100,9 @@ SlashCmdList.UTILSASSISTFOREVER = function(message)
         .. " | melee: " .. (addon.Config.Get("checkMeleeAbilities") and "enabled" or "disabled"))
     print("Default buttons: " .. #addon.RangeCheck.buttons
         .. " | out-of-range buttons: " .. addon.RangeCheck.colored)
-    if addon.running then
+    print("Cooldown greying: " .. (addon.Config.Get("greyOnCooldown") and "enabled" or "disabled")
+        .. " | greyed buttons: " .. addon.CooldownGrey.greyed)
+    if addon.RangeCheck:Enabled() then
         for _, line in ipairs(addon.RangeCheck.references) do
             print(line)
         end

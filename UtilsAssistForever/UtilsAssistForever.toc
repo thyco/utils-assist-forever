@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: Utils Assist Forever
-## Notes: Independent utility features for WoW Forever, starting with action-bar range checks.
+## Notes: Independent range and cooldown icon utilities for WoW Forever.
 ## Author: Utils Assist Forever
-## Version: 0.1.0
+## Version: 0.2.0
 ## SavedVariablesPerCharacter: UtilsAssistForeverDB
 
 Core.lua
@@ -13,7 +13,9 @@ Services/NextSwing.lua
 Services/Range.lua
 Services/Buttons.lua
 Services/IconTint.lua
+Services/Cooldown.lua
 Features/RangeCheck.lua
+Features/CooldownGrey.lua
 Services/SettingsWidgets.lua
 SettingsPanel.lua
 Bootstrap.lua

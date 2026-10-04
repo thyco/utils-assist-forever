@@ -2,6 +2,10 @@ local _, addon = ...
 local feature = { buttons = {}, colored = 0, references = {} }
 addon.RangeCheck = feature
 
+function feature:Enabled()
+    return addon.Config.Get("checkRangedAbilities") or addon.Config.Get("checkMeleeAbilities")
+end
+
 function feature:Refresh(discover, rebuild)
     if rebuild then
         addon.Range:Rebuild()

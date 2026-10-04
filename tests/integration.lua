@@ -266,11 +266,13 @@ test('range checkbox remains inside its own settings section', function()
     local count = 0
     for _ in pairs(panel.controls) do count = count + 1 end
 
-    equal(count, 2)
-    equal(#panel.sections, 1)
+    equal(count, 6)
+    equal(#panel.sections, 2)
     equal(panel.controls.checkRangedAbilities.Text.text, 'Check ranged abilities')
     equal(panel.controls.checkRangedAbilities.parent, panel.sections[1])
     equal(panel.sections[1].children[1].text, 'Range checks')
+    equal(panel.controls.greyOnCooldown.parent, panel.sections[2])
+    equal(panel.sections[2].children[1].text, 'Cooldown greying')
 end)
 
 test('slash config command opens registered native category', function()
@@ -476,11 +478,12 @@ test('melee checkbox is independent of ranged checkbox', function()
     equal(world.env.UtilsAssistForeverDB.checkMeleeAbilities, false)
 end)
 
-test('both disabled remove the polling handler', function()
+test('all utility features disabled remove the polling handler', function()
     local world, addon = setup()
 
     addon.Config.Set('checkRangedAbilities', false)
     addon.Config.Set('checkMeleeAbilities', false)
+    addon.Config.Set('greyOnCooldown', false)
 
     for _, frame in ipairs(world.frames) do equal(frame.scripts.OnUpdate, nil) end
     native(world.main)

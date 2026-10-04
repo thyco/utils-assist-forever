@@ -1,6 +1,6 @@
 local addonName, addon = ...
 addon.name = addonName
-addon.version = "0.1.0"
+addon.version = "0.2.0"
 addon.features = {}
 addon.started = false
 addon.running = false
@@ -22,14 +22,18 @@ function addon:Start()
 end
 
 function addon:ApplySettings()
-    self.running = self.Config.Get("checkRangedAbilities") or self.Config.Get("checkMeleeAbilities")
+    self.running = false
+    for _, feature in ipairs(self.features) do
+        if feature:Enabled() then
+            self.running = true
+        else
+            feature:Stop()
+        end
+    end
+
     self:SetPolling(self.running)
     if self.running then
         self:Refresh(true, true)
-    else
-        for _, feature in ipairs(self.features) do
-            feature:Stop()
-        end
     end
 end
 
@@ -39,6 +43,8 @@ function addon:Refresh(discover, rebuild)
     end
 
     for _, feature in ipairs(self.features) do
-        feature:Refresh(discover, rebuild)
+        if feature:Enabled() then
+            feature:Refresh(discover, rebuild)
+        end
     end
 end
