@@ -115,6 +115,16 @@ function Helpers.new()
         function value:SetText(text) self.text = text end
         function value:SetTextColor(...) self.textColor = { ... } end
         function value:SetFontObject(font) self.font = font end
+        function value:SetMinMaxValues(minimum, maximum) self.minimum = minimum; self.maximum = maximum end
+        function value:SetValueStep(step) self.step = step end
+        function value:SetObeyStepOnDrag(obey) self.obeyStepOnDrag = obey end
+        function value:SetValue(amount)
+            self.value = amount
+            if self.scripts.OnValueChanged then self.scripts.OnValueChanged(self, amount) end
+        end
+        function value:GetValue() return self.value end
+        function value:SetEnabled(enabled) self.enabled = enabled end
+        function value:IsEnabled() return self.enabled ~= false end
         function value:SetChecked(checked) self.checked = checked end
         function value:GetChecked() return self.checked end
         function value:Hide() self.shown = false; if self.scripts.OnHide then self.scripts.OnHide(self) end end

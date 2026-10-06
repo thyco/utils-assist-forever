@@ -58,3 +58,64 @@ function Widgets.Checkbox(parent, label, y, setting, tooltip, x)
 
     return check
 end
+
+function Widgets.GraphicsSetting(parent, setting, y, graphics)
+    Widgets.Text(parent, setting.label, 16, y, "GameFontHighlight")
+
+    local slider = CreateFrame("Slider", nil, parent, "OptionsSliderTemplate")
+    slider:SetPoint("TOPLEFT", parent, "TOPLEFT", 22, y - 32)
+    slider:SetSize(180, 20)
+    slider:SetMinMaxValues(setting.min, setting.max)
+    if slider.SetValueStep then
+        slider:SetValueStep(setting.step)
+    end
+    if slider.SetObeyStepOnDrag then
+        slider:SetObeyStepOnDrag(true)
+    end
+    Widgets.Tooltip(slider, setting.description)
+
+    local reset = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
+    reset:SetPoint("TOPLEFT", parent, "TOPLEFT", 220, y - 26)
+    reset:SetSize(120, 24)
+    reset:SetText("Reset to default")
+    Widgets.Tooltip(reset, "Restore only this setting to the current WoW client's default.")
+
+    local status = Widgets.Text(parent, "", 16, y - 68)
+    local control = { slider = slider, reset = reset, status = status }
+    local updating = false
+
+    function control.refresh()
+        local state = graphics.Status(setting.key)
+        slider:SetEnabled(state.writable)
+        reset:SetEnabled(state.writable and state.default ~= nil)
+
+        updating = true
+        slider:SetValue(math.max(setting.min, math.min(setting.max, state.value or setting.min)))
+        updating = false
+
+        if not state.available then
+            status:SetText("Unavailable on this client")
+        else
+            status:SetText("Current: " .. tostring(state.value)
+                .. "  |  Default: " .. tostring(state.default or "unavailable"))
+        end
+    end
+
+    slider:SetScript("OnValueChanged", function(_, value)
+        if updating or not addon.Client.Number(value) then
+            return
+        end
+
+        local steps = math.floor((value - setting.min) / setting.step + 0.5)
+        local selected = math.max(setting.min, math.min(setting.max, setting.min + steps * setting.step))
+        graphics.Set(setting.key, selected)
+        control.refresh()
+    end)
+    reset:SetScript("OnClick", function()
+        graphics.Reset(setting.key)
+        control.refresh()
+    end)
+    control.refresh()
+
+    return control
+end

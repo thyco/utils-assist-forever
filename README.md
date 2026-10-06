@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. Supports every class and all eight default Blizzard action bars. Version 0.3.3 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.4.0 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.3.3.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.4.0.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -34,7 +34,11 @@ The **Cooldown greying** group contains four checkboxes:
 
 The **Action bar click-through** group contains one checkbox for each of the eight default bars. All are off by default, so bars remain clickable. Enabling a checkbox disables mouse clicks on that bar; key bindings still work. Changes made during combat are saved immediately and applied when combat ends.
 
-Preferences are saved separately for each character in `UtilsAssistForeverDB`. Existing Range Assist Forever, GreyOnCooldown and BarNoClicky settings are not imported; each character starts with the defaults above. Changes apply immediately outside combat; protected click-through changes wait until combat ends. Disabling both range checks, cooldown greying and all click-through bars stops polling. Each checkbox affects only its category.
+The **Graphics settings** group contains **Grass & ground-effect density** and its own **Reset to default** button. The slider adjusts WoW's `groundEffectDensity` CVar from 16 to 256 in steps of 8. The displayed current value is read back from the client. Reset restores the default reported by this client for that CVar alone; no default number is hard-coded. The controls are disabled when the CVar is absent, locked, read-only or unavailable for writing in combat. A manual override is reapplied after login and after Blizzard's Ground Clutter preset changes. Until a value is chosen or reset, the addon leaves the client's existing graphic setting alone.
+
+If KelaGraphics remains enabled and also manages `groundEffectDensity`, the last addon to write that CVar determines its live value. Choose the density in one addon.
+
+The utility checkboxes are saved per character in `UtilsAssistForeverDB`. Graphics overrides are saved account-wide in `UtilsAssistForeverGraphicsDB`, as a separate entry for each graphics control. Reset writes the client's default and removes only that control's override. Existing Range Assist Forever, GreyOnCooldown and BarNoClicky settings are not imported; each character starts with the utility defaults above. Changes apply immediately outside combat; protected click-through changes wait until combat ends. Disabling both range checks, cooldown greying and all click-through bars stops polling. Each checkbox affects only its category.
 
 ## Action bar click-through and combat macros
 
@@ -99,7 +103,7 @@ Run `/uaf` for the current unit, enabled categories, button counts, each checked
 
 ## Development
 
-The range feature, secure icon hooks, API test doubles and manifest-based ZIP packaging were migrated from Range Assist Forever. The cooldown feature is adapted from GreyOnCooldown 2.0.2. Click-through is adapted from BarNoClicky 1.0.6. The latter two addons are GPL-3.0 licensed; this distribution includes their license text. The features retain separate settings and checks.
+The range feature, secure icon hooks, API test doubles and manifest-based ZIP packaging were migrated from Range Assist Forever. The cooldown feature is adapted from GreyOnCooldown 2.0.2. Click-through is adapted from BarNoClicky 1.0.6. The latter two addons are GPL-3.0 licensed; this distribution includes their license text. KelaGraphics was used only as a reference for the public CVar name and its documented range; none of its proprietary code or assets are included. The features retain separate settings and checks.
 
 ```sh
 lua tests/run.lua
@@ -107,6 +111,7 @@ lua tests/integration.lua
 lua tests/next_swing.lua
 lua tests/cooldown.lua
 lua tests/clickthrough.lua
+lua tests/graphics.lua
 python3 scripts/package.py
 ```
 
@@ -125,5 +130,6 @@ Local tests cannot establish actual Forever spell metadata, rendering or secure 
 7. Repeat in combat and watch for Lua errors or blocked-action messages. Verify unknown/restricted range checks restore the native icon.
 8. Test a real cooldown, a global cooldown, an unusable action, insufficient resources, and a pet action. Toggle each cooldown setting and confirm normal icon color returns after the cooldown. Check a spell that is both out of range and on cooldown: it should be red first, then grey when range becomes valid.
 9. Enable click-through on one bar and confirm mouse clicks pass through while key bindings still activate abilities. Put a macro with combat and no-combat spell branches on that bar; its icon should switch on both combat transitions without hovering over it. Check paging and a different bar left clickable. Toggle click-through during combat and confirm the mouse change applies when combat ends.
+10. In Graphics settings, change grass and ground-effect density, reload and confirm the value persists. Change Blizzard's Ground Clutter preset and confirm the manual density returns. Press this setting's Reset button and confirm the displayed value returns to the client's reported default without changing other graphic settings. Repeat on another character to confirm the graphic choice is account-wide.
 
 For the new reference check, put Raptor Strike or Heroic Strike on a bar directly and in a uniquely named combined macro. Run `/uaf` near and far from an enemy, before and after queuing the attack. Confirm diagnostics show `Wing Clip reference` on a hunter or `Hamstring reference` on a warrior (localized on other clients) and, for the combined macro, `macro body`. Repeat in combat and with no selected target plus an enemy mouseover. Edit the macro and verify detection refreshes. If the selected reference is unavailable or does not change with distance, send the `/uaf` output; icons intentionally remain native when the result is unknown.

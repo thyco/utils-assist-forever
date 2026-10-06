@@ -1,5 +1,5 @@
 local _, addon = ...
-local panel = { controls = {}, sections = {} }
+local panel = { controls = {}, graphicsControls = {}, sections = {} }
 addon.SettingsPanel = panel
 
 local function checkbox(section, key, label, y, tooltip, x)
@@ -15,6 +15,10 @@ end
 
 function panel:Refresh()
     for _, control in pairs(self.controls) do
+        control.refresh()
+    end
+
+    for _, control in pairs(self.graphicsControls) do
         control.refresh()
     end
 end
@@ -37,7 +41,10 @@ function panel:Initialize()
 
     local content = CreateFrame("Frame", nil, scroll)
     self.content = content
-    content:SetSize(math.max(scroll:GetWidth(), 1), 704)
+    local graphicsTop = -474
+    local graphicsHeight = 74 + #addon.Graphics.settings * 100
+    local clickTop = graphicsTop - graphicsHeight - 16
+    content:SetSize(math.max(scroll:GetWidth(), 1), -clickTop + 230)
     scroll:SetScrollChild(content)
     scroll:SetScript("OnSizeChanged", function(_, width)
         content:SetWidth(math.max(width, 1))
@@ -67,8 +74,16 @@ function panel:Initialize()
     checkbox(cooldown, "greyPetActions", "Grey pet actions", -164,
         "Include Blizzard pet action buttons in cooldown and unusable checks.")
 
+    local graphics = widgets.Section(content, "Graphics settings",
+        "Account-wide controls with individual reset buttons", graphicsTop, graphicsHeight)
+    self.sections[#self.sections + 1] = graphics
+    for index, setting in ipairs(addon.Graphics.settings) do
+        self.graphicsControls[setting.key] = widgets.GraphicsSetting(graphics, setting,
+            -62 - (index - 1) * 100, addon.Graphics)
+    end
+
     local click = widgets.Section(content, "Action bar click-through",
-        "Mouse clicks pass through selected bars; key bindings still work", -474, 210)
+        "Mouse clicks pass through selected bars; key bindings still work", clickTop, 210)
     self.sections[#self.sections + 1] = click
     for index = 1, 8 do
         local column = index > 4 and 1 or 0

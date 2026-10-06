@@ -32,9 +32,10 @@ function addon:SetPolling(enabled)
 end
 
 frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function(self, event)
+frame:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
         addon.Config.Initialize()
+        addon.Graphics.Initialize()
         addon.SettingsPanel:Initialize()
         addon:Start()
         if not addon.started then
@@ -50,6 +51,7 @@ frame:SetScript("OnEvent", function(self, event)
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
         self:RegisterEvent("PLAYER_REGEN_DISABLED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
+        self:RegisterEvent("CVAR_UPDATE")
         self:RegisterEvent("SPELLS_CHANGED")
         self:RegisterEvent("PLAYER_TALENT_UPDATE")
         self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
@@ -68,13 +70,19 @@ frame:SetScript("OnEvent", function(self, event)
         addon:Refresh(false, catalogDirty)
         catalogDirty = false
     elseif event == "PLAYER_REGEN_ENABLED" then
+        addon.Graphics.ApplySaved()
+        addon.SettingsPanel:Refresh()
         addon.BarClickThrough:OnCombatEnd()
         addon:Refresh(true, true)
         discoveryDirty, catalogDirty = false, false
     elseif event == "PLAYER_ENTERING_WORLD" then
+        addon.Graphics.ApplySaved()
         addon:Refresh(true, true)
         discoveryDirty, catalogDirty = false, false
+    elseif event == "CVAR_UPDATE" then
+        addon.Graphics.OnCVarUpdate(...)
     elseif event == "PLAYER_REGEN_DISABLED" then
+        addon.SettingsPanel:Refresh()
         if addon.BarClickThrough:Enabled() then
             addon.BarClickThrough:Refresh(false)
         end
