@@ -38,10 +38,24 @@ function feature:Discover()
 end
 
 function feature:ApplyMouse()
+    local shiftHeld = Client.Boolean(Client.Read(IsShiftKeyDown)) == true
+
     for _, entry in ipairs(self.buttons) do
-        local enabled = not addon.Config.Get("clickThroughBar" .. entry.barIndex)
+        local enabled = shiftHeld or not addon.Config.Get("clickThroughBar" .. entry.barIndex)
         setMouse(entry.button, enabled)
     end
+end
+
+function feature:OnModifierChanged(key)
+    if key ~= "LSHIFT" and key ~= "RSHIFT" then
+        return
+    end
+
+    if InCombatLockdown() or not self:Enabled() then
+        return
+    end
+
+    self:ApplyMouse()
 end
 
 local function refreshMacroIcon(button)

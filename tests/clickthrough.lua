@@ -27,6 +27,14 @@ local function setup(configure)
             return 202
         end,
     }
+
+    world.shift = false
+    world.env.IsShiftKeyDown = function() return world.shift end
+    function world:holdShift(held)
+        self.shift = held
+        self:fire('MODIFIER_STATE_CHANGED', 'LSHIFT', held and 1 or 0)
+    end
+
     world.env.UtilsAssistForeverDB = { clickThroughBar1 = true }
     if configure then configure(world) end
 
@@ -48,6 +56,60 @@ test('selected bar becomes click-through and other bars stay clickable', functio
 
     equal(world.main.mouseEnabled, false)
     equal(world.side.mouseEnabled, true)
+end)
+
+test('holding Shift temporarily restores clicks without changing the saved bar choice', function()
+    local world = setup()
+
+    world:holdShift(true)
+
+    equal(world.main.mouseEnabled, true)
+    equal(world.side.mouseEnabled, true)
+    equal(world.env.UtilsAssistForeverDB.clickThroughBar1, true)
+
+    world:holdShift(false)
+
+    equal(world.main.mouseEnabled, false)
+    equal(world.side.mouseEnabled, true)
+end)
+
+test('Shift already held at login leaves a selected bar clickable until released', function()
+    local world = setup(function(w)
+        w.shift = true
+    end)
+
+    equal(world.main.mouseEnabled, true)
+
+    world:holdShift(false)
+
+    equal(world.main.mouseEnabled, false)
+end)
+
+test('bar choices changed while Shift is held apply when Shift is released', function()
+    local world, addon = setup()
+    world:holdShift(true)
+
+    addon.Config.Set('clickThroughBar2', true)
+
+    equal(world.side.mouseEnabled, true)
+    equal(world.env.UtilsAssistForeverDB.clickThroughBar2, true)
+
+    world:holdShift(false)
+
+    equal(world.main.mouseEnabled, false)
+    equal(world.side.mouseEnabled, false)
+end)
+
+test('Shift released in combat restores the saved choice after combat', function()
+    local world = setup()
+    world:holdShift(true)
+    world.combat = true
+
+    world:holdShift(false)
+    world.combat = false
+    world:fire('PLAYER_REGEN_ENABLED')
+
+    equal(world.main.mouseEnabled, false)
 end)
 
 test('all eight bars have independent per-character settings', function()

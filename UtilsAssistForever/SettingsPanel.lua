@@ -83,13 +83,13 @@ function panel:Initialize()
     end
 
     local click = widgets.Section(content, "Action bar click-through",
-        "Mouse clicks pass through selected bars; key bindings still work", clickTop, 210)
+        "Hold Shift to interact with selected bars; key bindings still work", clickTop, 210)
     self.sections[#self.sections + 1] = click
     for index = 1, 8 do
         local column = index > 4 and 1 or 0
         local row = (index - 1) % 4
         checkbox(click, "clickThroughBar" .. index, "Bar " .. index .. " click-through",
-            -62 - row * 34, "Disable mouse clicks on this default action bar. Changes made in combat apply when combat ends.",
+            -62 - row * 34, "Disable mouse clicks on this default action bar. Hold Shift to click or view tooltips outside combat. Changes made in combat apply when combat ends.",
             12 + column * 270)
     end
 

@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.4.4 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.4.5 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.4.4.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.4.5.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -32,7 +32,7 @@ The **Cooldown greying** group contains four checkboxes:
 - **Grey actions without resources** — disabled by default; extends unusable greying to insufficient resources.
 - **Grey pet actions** — enabled by default.
 
-The **Action bar click-through** group contains one checkbox for each of the eight default bars. All are off by default, so bars remain clickable. Enabling a checkbox disables mouse clicks on that bar; key bindings still work. Changes made during combat are saved immediately and applied when combat ends.
+The **Action bar click-through** group contains one checkbox for each of the eight default bars. All are off by default, so bars remain clickable. Enabling a checkbox disables mouse clicks on that bar; key bindings still work. Hold Shift outside combat to temporarily click, move spells or view tooltips on selected bars. Releasing Shift restores each bar's saved choice. Changes made during combat are saved immediately and applied when combat ends.
 
 The **Graphics settings** group contains **Grass & ground-effect density** and its own **Reset to default** button. The slider adjusts WoW's `groundEffectDensity` CVar from 16 to 256 in steps of 8. The displayed current value is read back from the client. Reset restores the default reported by this client for that CVar alone; no default number is hard-coded. The controls are disabled when the CVar is absent, locked, read-only or unavailable for writing in combat. A manual override is reapplied after login and after Blizzard's Ground Clutter preset changes. Until a value is chosen or reset, the addon leaves the client's existing graphic setting alone.
 
@@ -42,7 +42,7 @@ The utility checkboxes are saved per character in `UtilsAssistForeverDB`. Graphi
 
 ## Action bar click-through and combat macros
 
-The click-through feature adapts **BarNoClicky 1.0.6** by mostlyharmlessx. It changes only mouse input on the selected default bars, never their key bindings. For the reported stale icon on `[combat]` and `[nocombat]` macros, Utils Assist Forever samples the current action texture while a bar is click-through and refreshes the icon on combat transitions and subsequent polls. It checks the button's live action slot, so paging and moved macros are covered. Non-macro icons and unreadable texture results are left alone. The addon does not parse or execute macro commands for this visual refresh.
+The click-through feature adapts **BarNoClicky 1.0.6** by mostlyharmlessx. It changes only mouse input on the selected default bars, never their key bindings. Shift temporarily restores mouse interaction outside combat. For the reported stale icon on `[combat]` and `[nocombat]` macros, Utils Assist Forever samples the current action texture while a bar is click-through and refreshes the icon on combat transitions and subsequent polls. It checks the button's live action slot, so paging and moved macros are covered. Non-macro icons and unreadable texture results are left alone. The addon does not parse or execute macro commands for this visual refresh.
 
 Use `/uaf config` to change bars, `/uaf clicky 1-8|all` or `/uaf noclicky 1-8|all` for commands, and `/uaf status` to list every bar. The original `/bnc` and `/barnoclicky` aliases also work (`c`, `nc`, `s` and `o`).
 

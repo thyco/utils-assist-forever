@@ -56,6 +56,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
         self:RegisterEvent("PLAYER_REGEN_ENABLED")
         self:RegisterEvent("PLAYER_REGEN_DISABLED")
+        self:RegisterEvent("MODIFIER_STATE_CHANGED")
         self:RegisterEvent("PLAYER_ENTERING_WORLD")
         self:RegisterEvent("CVAR_UPDATE")
         self:RegisterEvent("SPELLS_CHANGED")
@@ -93,6 +94,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
         if addon.BarClickThrough:Enabled() then
             addon.BarClickThrough:Refresh(false)
         end
+    elseif event == "MODIFIER_STATE_CHANGED" then
+        addon.BarClickThrough:OnModifierChanged(...)
     elseif event == "UPDATE_MACROS" then
         catalogDirty, discoveryDirty = true, true
     elseif event == "SPELLS_CHANGED" or event == "PLAYER_TALENT_UPDATE"
