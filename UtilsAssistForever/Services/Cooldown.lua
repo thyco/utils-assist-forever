@@ -179,6 +179,10 @@ function Cooldown.Action(slot, spellID)
 
         local info = cooldownInfo(C_ActionBar and C_ActionBar.GetActionCooldown, slot)
             or cooldownInfo(GetActionCooldown, slot)
+        if info and Client.Boolean(info.isActive) == false then
+            return false
+        end
+
         local duration = durationActive(C_ActionBar and C_ActionBar.GetActionCooldownDuration, slot, info)
         if duration ~= nil then
             return duration
@@ -198,6 +202,10 @@ function Cooldown.Action(slot, spellID)
 
         local info = cooldownInfo(C_Spell and C_Spell.GetSpellCooldown, spellID)
             or cooldownInfo(GetSpellCooldown, spellID)
+        if info and Client.Boolean(info.isActive) == false then
+            return false
+        end
+
         local duration = durationActive(C_Spell and C_Spell.GetSpellCooldownDuration, spellID, info)
         if duration ~= nil then
             return duration

@@ -87,6 +87,20 @@ test('duration object greys when standard cooldown info is incomplete', function
     grey(world.main)
 end)
 
+test('explicitly inactive cooldown skips duration-object work', function()
+    local durationReads = 0
+    local world = setup(function(w)
+        w.cooldowns[1] = { startTime = 0, duration = 0, isEnabled = true, isActive = false }
+        w.env.C_ActionBar.GetActionCooldownDuration = function()
+            durationReads = durationReads + 1
+            return nil
+        end
+    end)
+
+    native(world.main)
+    equal(durationReads, 0)
+end)
+
 test('secret duration curve result can grey without inspecting the duration', function()
     local world = setup(function(w)
         w.cooldowns[1] = { isOnGCD = false, isEnabled = true }
