@@ -25,14 +25,16 @@ function feature:Refresh(discover, rebuild)
         local outOfRange = false
         if addon.Range.hasTarget and addon.Client.Boolean(button:IsVisible()) == true then
             -- Live slots handle paging; displayed spell IDs handle macro changes.
-            local queued, source, suppress = addon.NextSwing:ForAction(button.action, addon.Range.unit)
+            local kind, id, subtype = addon.Client.ActionInfo(button.action)
+            local queued, source, suppress = addon.NextSwing:ForAction(button.action, addon.Range.unit,
+                kind, id, subtype)
             if queued then
                 outOfRange = addon.Range:IsMeleeOutOfRange()
                 self.references[#self.references + 1] = "Action slot " .. button.action
                     .. ": " .. source .. " -> next-swing spell " .. queued .. " -> " .. addon.NextSwing.referenceLabel
             elseif not suppress then
-                local id = addon.Client.ActionSpell(button.action)
-                outOfRange = addon.Range:IsOutOfRange(id)
+                local spellID = addon.Client.ActionSpell(kind, id, subtype)
+                outOfRange = addon.Range:IsOutOfRange(spellID)
             end
         end
 

@@ -121,6 +121,7 @@ test('opaque curve result is reapplied without comparing it', function()
     end)
     local writes = world.main.icon.writes
 
+    world:fire('SPELL_UPDATE_COOLDOWN')
     world:tick(0.1)
 
     equal(world.main.icon.writes > writes, true)
@@ -151,6 +152,7 @@ test('opaque cooldown is checked before comparing it with a readable update', fu
     end
 
     world.usable[1] = { false, false }
+    world:fire('ACTIONBAR_UPDATE_USABLE')
     world:tick(0.1)
 
     equal(checkedStoredValue, true, 'stored opaque amount must be guarded')
@@ -175,12 +177,12 @@ test('finished cooldown restores native icon', function()
 
     world.cooldowns[1] = { startTime = 10, duration = 8, isEnabled = true, isOnGCD = false }
     world.env.GetTime = function() return 19 end
-    world:tick(0.1)
+    world:tick(0.3)
 
     native(world.main)
 end)
 
-test('cooldown event refreshes without waiting for the poll', function()
+test('cooldown event refreshes on the next short poll', function()
     local world = setup(function(w)
         w.env.GetTime = function() return 12 end
     end)
@@ -188,6 +190,80 @@ test('cooldown event refreshes without waiting for the poll', function()
 
     world.cooldowns[1] = { startTime = 10, duration = 8, isEnabled = true, isOnGCD = false }
     world:fire('SPELL_UPDATE_COOLDOWN')
+    native(world.main)
+
+    world:tick(0.1)
+
+    grey(world.main)
+end)
+
+test('multiple cooldown events share one button scan', function()
+    local reads = 0
+    local world = setup(function(w)
+        w.env.GetTime = function() return 12 end
+        w.env.C_ActionBar.IsUsableAction = function()
+            reads = reads + 1
+            return true, false
+        end
+    end)
+    local baseline = reads
+
+    world.cooldowns[1] = { startTime = 10, duration = 8, isEnabled = true, isOnGCD = false }
+    world:fire('SPELL_UPDATE_COOLDOWN')
+    world:fire('ACTIONBAR_UPDATE_COOLDOWN')
+    world:fire('ACTIONBAR_UPDATE_USABLE')
+    equal(reads, baseline)
+
+    world:tick(0.1)
+
+    equal(reads, baseline + 1)
+    grey(world.main)
+end)
+
+test('mouseover event bursts queue one cooldown scan', function()
+    local reads = 0
+    local world = setup(function(w)
+        w.env.C_ActionBar.IsUsableAction = function()
+            reads = reads + 1
+            return true, false
+        end
+    end)
+    local baseline = reads
+
+    world:fire('UPDATE_MOUSEOVER_UNIT')
+    world:fire('UPDATE_MOUSEOVER_UNIT')
+    world:fire('UPDATE_MOUSEOVER_UNIT')
+    equal(reads, baseline)
+
+    world:tick(0.1)
+
+    equal(reads, baseline + 1)
+end)
+
+test('target change queues a fresh usability check', function()
+    local world = setup()
+    native(world.main)
+
+    world.usable[1] = { false, false }
+    world:fire('PLAYER_TARGET_CHANGED')
+    native(world.main)
+
+    world:tick(0.1)
+
+    grey(world.main)
+end)
+
+test('quiet cooldown changes are found by the fallback poll', function()
+    local world = setup(function(w)
+        w.env.GetTime = function() return 12 end
+    end)
+    world.cooldowns[1] = { startTime = 10, duration = 8, isEnabled = true, isOnGCD = false }
+
+    world:tick(0.1)
+    native(world.main)
+    world:tick(0.1)
+    native(world.main)
+    world:tick(0.1)
 
     grey(world.main)
 end)
@@ -201,6 +277,7 @@ test('native icon changes during grey are restored on cooldown completion', func
     world.main.icon:SetDesaturation(0.25)
 
     world.env.GetTime = function() return 19 end
+    world:fire('SPELL_UPDATE_COOLDOWN')
     world:tick(0.1)
 
     equal(world.main.icon.desaturation, 0.25)

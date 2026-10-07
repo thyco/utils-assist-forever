@@ -165,8 +165,7 @@ function Client.ActionInfo(slot)
     return kind, id, subtype
 end
 
-function Client.ActionSpell(slot)
-    local kind, id, subtype = Client.ActionInfo(slot)
+function Client.ActionSpell(kind, id, subtype)
     if Client.Number(id) and (kind == "spell" or (kind == "macro" and subtype == "spell")) then
         return id
     end

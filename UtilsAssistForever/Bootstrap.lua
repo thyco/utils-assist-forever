@@ -1,7 +1,7 @@
 local _, addon = ...
 local frame = CreateFrame("Frame")
-local elapsedSinceUpdate, elapsedSinceDiscovery = 0, 0
-local discoveryDirty, catalogDirty = false, false
+local elapsedSinceUpdate, elapsedSinceDiscovery, elapsedSinceCooldown = 0, 0, 0
+local discoveryDirty, catalogDirty, cooldownDirty = false, false, false
 local discoveryEvents = {
     "ACTIONBAR_SLOT_CHANGED", "ACTIONBAR_PAGE_CHANGED", "UPDATE_BONUS_ACTIONBAR",
     "UPDATE_OVERRIDE_ACTIONBAR", "UPDATE_VEHICLE_ACTIONBAR", "UPDATE_MACROS",
@@ -11,23 +11,29 @@ local discoveryEvents = {
 local function update(_, elapsed)
     elapsedSinceUpdate = elapsedSinceUpdate + elapsed
     elapsedSinceDiscovery = elapsedSinceDiscovery + elapsed
+    elapsedSinceCooldown = elapsedSinceCooldown + elapsed
     if elapsedSinceUpdate < 0.1 then
         return
     end
 
     local discover = discoveryDirty or elapsedSinceDiscovery >= 0.5
+    local refreshCooldown = cooldownDirty or discover or elapsedSinceCooldown >= 0.25
     elapsedSinceUpdate = 0
     if discover then
         elapsedSinceDiscovery = 0
     end
+    if refreshCooldown then
+        elapsedSinceCooldown = 0
+        cooldownDirty = false
+    end
 
-    addon:Refresh(discover, catalogDirty)
+    addon:Refresh(discover, catalogDirty, refreshCooldown)
     discoveryDirty, catalogDirty = false, false
 end
 
 function addon:SetPolling(enabled)
-    elapsedSinceUpdate, elapsedSinceDiscovery = 0, 0
-    discoveryDirty, catalogDirty = false, false
+    elapsedSinceUpdate, elapsedSinceDiscovery, elapsedSinceCooldown = 0, 0, 0
+    discoveryDirty, catalogDirty, cooldownDirty = false, false, false
     frame:SetScript("OnUpdate", enabled and update or nil)
 end
 
@@ -67,7 +73,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
     end
 
     if event == "PLAYER_TARGET_CHANGED" or event == "UPDATE_MOUSEOVER_UNIT" then
-        addon:Refresh(false, catalogDirty)
+        cooldownDirty = true
+        addon:Refresh(false, catalogDirty, false)
         catalogDirty = false
     elseif event == "PLAYER_REGEN_ENABLED" then
         addon.Graphics.ApplySaved()
@@ -95,9 +102,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         or event == "SPELL_UPDATE_COOLDOWN" or event == "SPELL_UPDATE_USABLE"
         or event == "BAG_UPDATE_COOLDOWN" or event == "PET_BAR_UPDATE_COOLDOWN"
         or event == "PET_BAR_UPDATE_USABLE" then
-        if addon.CooldownGrey:Enabled() then
-            addon.CooldownGrey:Refresh(false)
-        end
+        cooldownDirty = true
     else
         discoveryDirty = true
     end

@@ -66,8 +66,7 @@ function NextSwing:Rebuild(entries)
     addon.Macros:Rebuild()
 end
 
-function NextSwing:ForAction(slot, unit)
-    local kind, id, subtype = Client.ActionInfo(slot)
+function NextSwing:ForAction(slot, unit, kind, id, subtype)
     if kind == 'macro' then
         local queued, inspected = addon.Macros:NextSwing(slot, unit, self.names)
         if queued then

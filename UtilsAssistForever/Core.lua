@@ -1,6 +1,6 @@
 local addonName, addon = ...
 addon.name = addonName
-addon.version = "0.4.0"
+addon.version = "0.4.1"
 addon.features = {}
 addon.started = false
 addon.running = false
@@ -37,13 +37,13 @@ function addon:ApplySettings()
     end
 end
 
-function addon:Refresh(discover, rebuild)
+function addon:Refresh(discover, rebuild, refreshCooldown)
     if not self.started or not self.running then
         return
     end
 
     for _, feature in ipairs(self.features) do
-        if feature:Enabled() then
+        if feature:Enabled() and (feature ~= self.CooldownGrey or refreshCooldown ~= false) then
             feature:Refresh(discover, rebuild)
         end
     end

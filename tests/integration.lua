@@ -198,6 +198,31 @@ test('unchanged range polls do not rewrite icon textures', function()
     equal(world.bookReads, bookReads, 'spellbook is not rescanned by polling')
 end)
 
+test('range checks read each visible action once per refresh', function()
+    local reads = {}
+    local world = setup(function(w)
+        w.env.UtilsAssistForeverDB = { greyOnCooldown = false }
+        w.empty = w:button('ActionButton2', 2)
+        w.env.GetActionInfo = function(slot)
+            reads[slot] = (reads[slot] or 0) + 1
+
+            local action = w.actions[slot]
+            if action then
+                return action[1], action[2], action[3]
+            end
+        end
+    end)
+    local mainReads, sideReads, emptyReads = reads[1], reads[67], reads[2]
+
+    world:tick(0.1)
+
+    equal(reads[1], mainReads + 1)
+    equal(reads[67], sideReads + 1)
+    equal(reads[2], emptyReads + 1)
+    tinted(world.main)
+    tinted(world.side)
+end)
+
 test('updates are throttled rather than running on every frame', function()
     local world = setup()
     local queries = world.queries[10]
