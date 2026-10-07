@@ -53,7 +53,7 @@ local function setup(configure)
 
     local manifest = assert(io.open('UtilsAssistForever/UtilsAssistForever.toc'))
     for line in manifest:lines() do
-        if line:match('%.lua$') then
+        if line:match('%.lua$') and not line:match('^Libs/') then
             assert(loadfile('UtilsAssistForever/' .. line, 't', w.env))('UtilsAssistForever', w.addon)
         end
     end

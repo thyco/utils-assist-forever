@@ -21,6 +21,7 @@ function panel:Refresh()
     for _, control in pairs(self.graphicsControls) do
         control.refresh()
     end
+
 end
 
 function panel:Initialize()
@@ -41,7 +42,7 @@ function panel:Initialize()
 
     local content = CreateFrame("Frame", nil, scroll)
     self.content = content
-    local graphicsTop = -474
+    local graphicsTop = -668
     local graphicsHeight = 74 + #addon.Graphics.settings * 100
     local clickTop = graphicsTop - graphicsHeight - 16
     content:SetSize(math.max(scroll:GetWidth(), 1), -clickTop + 230)
@@ -63,7 +64,24 @@ function panel:Initialize()
     checkbox(range, "checkRangedAbilities", "Check ranged abilities", -62, rangeTip)
     checkbox(range, "checkMeleeAbilities", "Check melee abilities", -96, rangeTip)
 
-    local cooldown = widgets.Section(content, "Cooldown greying", "Action icons on cooldown or unusable", -210, 248)
+    local queued = widgets.Section(content, "Queued attacks",
+        "Highlight next-melee-swing attacks when Blizzard marks them active", -210, 178)
+    self.sections[#self.sections + 1] = queued
+    checkbox(queued, "highlightQueuedAttacks", "Highlight queued next-swing attacks", -62,
+        "Add a moving border to queued Heroic Strike, Cleave, Raptor Strike and Maul buttons, including supported macros. Turn off to use only Blizzard's native indicator.")
+    checkbox(queued, "queuedGlowNativeColor", "Use glow's native color", -96,
+        "Use LibCustomGlow's built-in yellow Pixel Glow color rather than the custom color below.")
+
+    local colorSetting = Settings.RegisterProxySetting(self.category,
+        "UtilsAssistForever_queuedGlowColor", Settings.VarType.String,
+        "Custom glow color", addon.Config.GetDefault("queuedGlowColor"), function()
+            return addon.Config.Get("queuedGlowColor")
+        end, function(value)
+            addon.Config.Set("queuedGlowColor", value)
+        end)
+    self.controls.queuedGlowColor = widgets.Color(queued, "Custom glow color", -142, colorSetting)
+
+    local cooldown = widgets.Section(content, "Cooldown greying", "Action icons on cooldown or unusable", -404, 248)
     self.sections[#self.sections + 1] = cooldown
     checkbox(cooldown, "greyOnCooldown", "Grey actions on cooldown", -62,
         "Desaturate action icons on a real cooldown. The global cooldown is ignored.")

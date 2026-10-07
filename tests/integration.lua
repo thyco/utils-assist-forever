@@ -23,7 +23,7 @@ local function setup(configure)
     local manifest = io.open('UtilsAssistForever/UtilsAssistForever.toc')
     assert(manifest, 'addon manifest is not implemented')
     for line in manifest:lines() do
-        if line:match('%.lua$') then
+        if line:match('%.lua$') and not line:match('^Libs/') then
             local chunk = assert(loadfile('UtilsAssistForever/' .. line, 't', world.env))
             chunk('UtilsAssistForever', world.addon)
         end
@@ -304,17 +304,21 @@ test('range checkbox remains inside its own settings section', function()
     local count = 0
     for _ in pairs(panel.controls) do count = count + 1 end
 
-    equal(count, 14)
-    equal(#panel.sections, 4)
+    equal(count, 17)
+    equal(#panel.sections, 5)
     equal(panel.controls.checkRangedAbilities.Text.text, 'Check ranged abilities')
     equal(panel.controls.checkRangedAbilities.parent, panel.sections[1])
     equal(panel.sections[1].children[1].text, 'Range checks')
-    equal(panel.controls.greyOnCooldown.parent, panel.sections[2])
-    equal(panel.sections[2].children[1].text, 'Cooldown greying')
-    equal(panel.sections[3].children[1].text, 'Graphics settings')
-    equal(panel.graphicsControls.groundEffectDensity.slider.parent, panel.sections[3])
-    equal(panel.controls.clickThroughBar1.parent, panel.sections[4])
-    equal(panel.sections[4].children[1].text, 'Action bar click-through')
+    equal(panel.controls.highlightQueuedAttacks.parent, panel.sections[2])
+    equal(panel.controls.queuedGlowNativeColor.parent, panel.sections[2])
+    equal(panel.controls.queuedGlowColor.parent, panel.sections[2])
+    equal(panel.sections[2].children[1].text, 'Queued attacks')
+    equal(panel.controls.greyOnCooldown.parent, panel.sections[3])
+    equal(panel.sections[3].children[1].text, 'Cooldown greying')
+    equal(panel.sections[4].children[1].text, 'Graphics settings')
+    equal(panel.graphicsControls.groundEffectDensity.slider.parent, panel.sections[4])
+    equal(panel.controls.clickThroughBar1.parent, panel.sections[5])
+    equal(panel.sections[5].children[1].text, 'Action bar click-through')
 end)
 
 test('settings groups live inside a bounded scroll viewport', function()
@@ -327,9 +331,9 @@ test('settings groups live inside a bounded scroll viewport', function()
     equal(scroll.parent, panel.canvas)
     equal(scroll.scrollChild, panel.content)
     equal(panel.content.parent, scroll)
-    equal(panel.content.height, 894)
+    equal(panel.content.height, 1088)
     equal(panel.sections[1].parent, panel.content)
-    equal(panel.sections[4].parent, panel.content)
+    equal(panel.sections[5].parent, panel.content)
     equal(scroll.points[1][1], 'TOPLEFT')
     equal(scroll.points[2][1], 'BOTTOMRIGHT')
 
@@ -566,6 +570,7 @@ test('all utility features disabled remove the polling handler', function()
 
     addon.Config.Set('checkRangedAbilities', false)
     addon.Config.Set('checkMeleeAbilities', false)
+    addon.Config.Set('highlightQueuedAttacks', false)
     addon.Config.Set('greyOnCooldown', false)
 
     for _, frame in ipairs(world.frames) do equal(frame.scripts.OnUpdate, nil) end

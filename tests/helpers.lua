@@ -137,6 +137,7 @@ function Helpers.new()
         function value:CreateFontString() return frame('FontString', nil, self) end
         function value:CreateTexture() return frame('Texture', nil, self) end
         function value:SetTexture(texture) self.texture = texture; self.textureWrites = self.textureWrites + 1 end
+        function value:SetColorTexture(r, g, b, a) self.color = { r, g, b, a or 1 } end
         function value:GetTexture() return self.texture end
         function value:SetAllPoints() end
         function value:SetScrollChild(child) self.scrollChild = child end
@@ -177,13 +178,14 @@ function Helpers.new()
     env.UIParent = frame('Frame')
     env.CreateFrame = frame
     env.Settings = {
-        VarType = { Boolean = 'boolean', Number = 'number' },
+        VarType = { Boolean = 'boolean', Number = 'number', String = 'string' },
         RegisterCanvasLayoutCategory = function(canvas, name)
             world.category = { canvas = canvas, name = name, GetID = function() return 123 end }
             return world.category
         end,
         RegisterProxySetting = function(category, variable, valueType, name, default, getter, setter)
-            assert(category == world.category and (valueType == 'boolean' or valueType == 'number'))
+            assert(category == world.category and (valueType == 'boolean' or valueType == 'number'
+                or valueType == 'string'))
             world.setting = { GetValue = function() return getter() end, SetValue = function(_, value) setter(value) end }
             return world.setting
         end,

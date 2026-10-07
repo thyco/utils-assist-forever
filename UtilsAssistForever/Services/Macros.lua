@@ -113,7 +113,7 @@ function Macros:NextSwing(slot, unit, names)
         end
 
         if Client.String(selected) and Client.Readable(target)
-            and (target == nil or target == unit) then
+            and (target == nil or unit == nil or target == unit) then
             selected = trim(selected):gsub('^!', '')
             local id = names[trim(selected)]
             if id then

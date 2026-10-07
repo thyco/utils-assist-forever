@@ -12,3 +12,15 @@ License: GNU General Public License, version 3
 
 The full license text is included in LICENSE.txt. The integrations use
 Utils Assist Forever's per-character settings and feature framework.
+
+Bundled for queued-attack Pixel Glow:
+
+LibCustomGlow-1.0, minor version 25
+Upstream: https://github.com/Stanzilla/LibCustomGlow
+License: MIT; see Libs/LibCustomGlow-1.0/LICENSE and DKForce-LICENSE
+
+LibStub, minor version 2
+License: public domain; declaration and credits are in Libs/LibStub/LibStub.lua
+
+Both library files and notices were copied from Warrior Assist Forever without
+modifying that addon. See Libs/README.md for provenance and compatibility details.

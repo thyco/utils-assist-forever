@@ -59,6 +59,56 @@ function Widgets.Checkbox(parent, label, y, setting, tooltip, x)
     return check
 end
 
+function Widgets.Color(parent, label, y, setting)
+    Widgets.Text(parent, label, 20, y - 5, "GameFontHighlight")
+
+    local swatch = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    swatch:SetPoint("TOPLEFT", parent, "TOPLEFT", 266, y)
+    swatch:SetSize(26, 24)
+    swatch:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1 })
+    swatch:SetBackdropBorderColor(0.7, 0.7, 0.7, 1)
+
+    local fill = swatch:CreateTexture(nil, "ARTWORK")
+    fill:SetPoint("TOPLEFT", swatch, "TOPLEFT", 3, -3)
+    fill:SetPoint("BOTTOMRIGHT", swatch, "BOTTOMRIGHT", -3, 3)
+
+    local function rgb()
+        local hex = setting:GetValue()
+        return tonumber(hex:sub(3, 4), 16) / 255,
+            tonumber(hex:sub(5, 6), 16) / 255, tonumber(hex:sub(7, 8), 16) / 255
+    end
+
+    swatch.refresh = function()
+        local r, g, b = rgb()
+        fill:SetColorTexture(r, g, b, 1)
+    end
+    swatch:SetScript("OnClick", function()
+        local previous = setting:GetValue()
+        local r, g, b = rgb()
+        ColorPickerFrame:SetupColorPickerAndShow({
+            r = r, g = g, b = b, hasOpacity = false,
+            swatchFunc = function()
+                local red, green, blue = ColorPickerFrame:GetColorRGB()
+                if not addon.Client.Number(red) or not addon.Client.Number(green)
+                    or not addon.Client.Number(blue) or red < 0 or red > 1
+                    or green < 0 or green > 1 or blue < 0 or blue > 1 then
+                    return
+                end
+
+                setting:SetValue(string.format("ff%02x%02x%02x",
+                    math.floor(red * 255 + 0.5), math.floor(green * 255 + 0.5),
+                    math.floor(blue * 255 + 0.5)))
+            end,
+            cancelFunc = function()
+                setting:SetValue(previous)
+            end,
+        })
+    end)
+    swatch.refresh()
+
+    return swatch
+end
+
 function Widgets.GraphicsSetting(parent, setting, y, graphics)
     Widgets.Text(parent, setting.label, 16, y, "GameFontHighlight")
 

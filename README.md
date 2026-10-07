@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.4.5 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Queued next-swing attacks gain a bright moving border. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.5.1 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.4.5.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.5.1.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -25,6 +25,8 @@ The **Range checks** group contains two checkboxes, both enabled by default:
 - **Check ranged abilities**
 - **Check melee abilities**
 
+The **Queued attacks** group has **Highlight queued next-swing attacks**, enabled by default. It adds a cyan moving border when Blizzard marks a supported next-swing button as active. The group also has **Use glow's native color** and a **Custom glow color** swatch. The swatch opens Blizzard's color picker, as in Warrior Assist Forever. Its native option leaves LibCustomGlow's Pixel Glow color untinted, which is yellow; this differs from Blizzard's checked-button texture. Turn off the highlight checkbox to keep only that original Blizzard indicator. Both color choices and the highlight checkbox are saved per character and are independent of range checking.
+
 The **Cooldown greying** group contains four checkboxes:
 
 - **Grey actions on cooldown** — enabled by default; skips the global cooldown.
@@ -38,7 +40,7 @@ The **Graphics settings** group contains **Grass & ground-effect density** and i
 
 If KelaGraphics remains enabled and also manages `groundEffectDensity`, the last addon to write that CVar determines its live value. Choose the density in one addon.
 
-The utility checkboxes are saved per character in `UtilsAssistForeverDB`. Graphics overrides are saved account-wide in `UtilsAssistForeverGraphicsDB`, as a separate entry for each graphics control. Reset writes the client's default and removes only that control's override. Existing Range Assist Forever, GreyOnCooldown and BarNoClicky settings are not imported; each character starts with the utility defaults above. Changes apply immediately outside combat; protected click-through changes wait until combat ends. Disabling both range checks, cooldown greying and all click-through bars stops polling. Each checkbox affects only its category.
+The utility checkboxes are saved per character in `UtilsAssistForeverDB`. Graphics overrides are saved account-wide in `UtilsAssistForeverGraphicsDB`, as a separate entry for each graphics control. Reset writes the client's default and removes only that control's override. Existing Range Assist Forever, GreyOnCooldown and BarNoClicky settings are not imported; each character starts with the utility defaults above. Changes apply immediately outside combat; protected click-through changes wait until combat ends. Disabling both range checks, queued-attack glow, cooldown greying and all click-through bars stops polling. Each checkbox affects only its category.
 
 ## Action bar click-through and combat macros
 
@@ -66,7 +68,7 @@ The addon preserves Blizzard's latest native icon color, alpha and desaturation 
 
 All eight default bars are covered, including live main-bar paging. Direct spell actions and macros with a client-exposed displayed spell are supported. Ordinary macros use the displayed spell against the chosen target/mouseover. Next-swing macros additionally support body detection as described below; cast sequences are not simulated. Items, pet actions, flyouts, unlearned spells, custom bars and unidentified macros remain native.
 
-There is no deadzone proximity inference, ammo indicator, reactive glow or distance estimate. This is not a facing, line-of-sight, resource or overall castability check. Invalid spell metadata is skipped. Spellbook membership and range metadata are refreshed on relevant events, including talent and form changes.
+Range checking has no deadzone proximity inference, ammo indicator, reactive glow or distance estimate. This is not a facing, line-of-sight, resource or overall castability check. Invalid spell metadata is skipped. Spellbook membership and range metadata are refreshed on relevant events, including talent and form changes.
 
 ## Next-swing melee attacks
 
@@ -97,6 +99,12 @@ The reference uses the same spellbook-first API and spell-ID fallback, once per 
 
 **Auto Attack returned unavailable through both APIs in the reported Forever test, so hunters use Wing Clip and warriors use Hamstring.** This feature reports its API answer, not whether an attack is queued or whether the next swing will hit.
 
+## Queued-attack glow
+
+Heroic Strike, Cleave, Raptor Strike and Maul buttons can show a moving Pixel Glow while Blizzard's own checked action-button indicator is active. The initial custom color is cyan; the native-color option uses Pixel Glow's built-in yellow. The addon recognizes learned next-swing spells on direct actions and supported macro bodies. It then reads the button's native checked state; it does not infer a queue from range, the target, or the spell's usability. The glow clears when the checked state clears, the button changes to another action, the active macro branch changes, or the highlight setting is disabled. Unknown or restricted checked states do not trigger it.
+
+`ACTIONBAR_UPDATE_STATE` drives queue changes; bar, macro, modifier and combat transitions also refresh eligibility. For a macro such as `/cast [combat] Heroic Strike; Shoot Bow`, only the Heroic Strike branch is eligible. The feature scans on those changes and during the existing button-discovery fallback, rather than checking the queued state every 0.1 seconds. Pixel Glow is precreated on default buttons outside combat and hidden until needed, so showing it during combat does not allocate the effect. The glow is a separate mouse-transparent layer and leaves Blizzard's original border and icon appearance intact. LibCustomGlow-1.0 and LibStub are bundled with their licenses.
+
 ## Diagnostics
 
 Run `/uaf` for the current unit, enabled categories, button counts, each checked spell's category/range metadata and the status of both range APIs. For next-swing buttons, diagnostics identify the action slot, whether recognition came from the macro body or displayed/direct spell, and the selected reference spell’s API statuses. Diagnostic records and explanations are built only for `/uaf`, not on every range poll. Diagnostics use safe text status labels and do not print restricted values or raw errors. When both categories are disabled, stale range checks are not printed.
@@ -112,10 +120,11 @@ lua tests/next_swing.lua
 lua tests/cooldown.lua
 lua tests/clickthrough.lua
 lua tests/graphics.lua
+lua tests/queued_glow.lua
 python3 scripts/package.py
 ```
 
-Lua tests require Lua 5.4; packaging requires Python 3.9+. The addon itself uses WoW-compatible Lua syntax. Range and click-through polling runs every 0.1 seconds; cooldown checks run after relevant events or about every 0.3 seconds when quiet. Button discovery runs every 0.5 seconds and on relevant bar events. Duplicate spell buttons share one range query per refresh. No range queries run without an eligible unit.
+Lua tests require Lua 5.4; packaging requires Python 3.9+. The addon itself uses WoW-compatible Lua syntax. Range and click-through polling runs every 0.1 seconds; cooldown checks run after relevant events or about every 0.3 seconds when quiet. Button discovery runs every 0.5 seconds and on relevant bar events. Queued glow state is checked on action-state changes and button discovery. Duplicate spell buttons share one range query per refresh. No range queries run without an eligible unit.
 
 ## In-game acceptance
 
@@ -131,5 +140,6 @@ Local tests cannot establish actual Forever spell metadata, rendering or secure 
 8. Test a real cooldown, a global cooldown, an unusable action, insufficient resources, and a pet action. Toggle each cooldown setting and confirm normal icon color returns after the cooldown. Check a spell that is both out of range and on cooldown: it should be red first, then grey when range becomes valid.
 9. Enable click-through on one bar and confirm mouse clicks pass through while key bindings still activate abilities. Put a macro with combat and no-combat spell branches on that bar; its icon should switch on both combat transitions without hovering over it. Check paging and a different bar left clickable. Toggle click-through during combat and confirm the mouse change applies when combat ends.
 10. In Graphics settings, change grass and ground-effect density, reload and confirm the value persists. Change Blizzard's Ground Clutter preset and confirm the manual density returns. Press this setting's Reset button and confirm the displayed value returns to the client's reported default without changing other graphic settings. Repeat on another character to confirm the graphic choice is account-wide.
+11. Queue a Heroic Strike, Cleave, Raptor Strike or Maul on a default bar. Confirm the moving border follows Blizzard's original checked indicator, including when the queued attack is cancelled or consumed. Change its color with the Blizzard picker, then select the native-color option and confirm the built-in yellow appearance. Test the `/cast [combat] Heroic Strike; Shoot Bow` macro as combat starts and ends, and verify that disabling the highlight setting removes only the extra glow. Repeat during combat and watch for blocked-action messages.
 
 For the new reference check, put Raptor Strike or Heroic Strike on a bar directly and in a uniquely named combined macro. Run `/uaf` near and far from an enemy, before and after queuing the attack. Confirm diagnostics show `Wing Clip reference` on a hunter or `Hamstring reference` on a warrior (localized on other clients) and, for the combined macro, `macro body`. Repeat in combat and with no selected target plus an enemy mouseover. Edit the macro and verify detection refreshes. If the selected reference is unavailable or does not change with distance, send the `/uaf` output; icons intentionally remain native when the result is unknown.

@@ -64,6 +64,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
         self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
         self:RegisterEvent("SPELL_DATA_LOAD_RESULT")
         self:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
+        self:RegisterEvent("ACTIONBAR_UPDATE_STATE")
         self:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
         self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
         self:RegisterEvent("SPELL_UPDATE_USABLE")
@@ -75,6 +76,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 
     if event == "PLAYER_TARGET_CHANGED" or event == "UPDATE_MOUSEOVER_UNIT" then
         cooldownDirty = true
+        addon.QueuedAttackGlow:MarkDirty()
         addon:Refresh(false, catalogDirty, false)
         catalogDirty = false
     elseif event == "PLAYER_REGEN_ENABLED" then
@@ -91,11 +93,15 @@ frame:SetScript("OnEvent", function(self, event, ...)
         addon.Graphics.OnCVarUpdate(...)
     elseif event == "PLAYER_REGEN_DISABLED" then
         addon.SettingsPanel:Refresh()
+        addon.QueuedAttackGlow:MarkDirty()
         if addon.BarClickThrough:Enabled() then
             addon.BarClickThrough:Refresh(false)
         end
     elseif event == "MODIFIER_STATE_CHANGED" then
         addon.BarClickThrough:OnModifierChanged(...)
+        addon.QueuedAttackGlow:MarkDirty()
+    elseif event == "ACTIONBAR_UPDATE_STATE" then
+        addon.QueuedAttackGlow:MarkDirty()
     elseif event == "UPDATE_MACROS" then
         catalogDirty, discoveryDirty = true, true
     elseif event == "SPELLS_CHANGED" or event == "PLAYER_TALENT_UPDATE"

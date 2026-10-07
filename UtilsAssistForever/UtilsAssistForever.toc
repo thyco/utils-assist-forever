@@ -1,11 +1,14 @@
 ## Interface: 16001
 ## Title: Utils Assist Forever
-## Notes: Range, cooldown and action-bar click-through utilities for WoW Forever.
+## Notes: Range, cooldown, queued-attack glow and action-bar click-through utilities for WoW Forever.
 ## Author: Utils Assist Forever
-## Version: 0.4.5
+## Version: 0.5.1
 ## IconTexture: Interface\AddOns\UtilsAssistForever\Media\icon.tga
 ## SavedVariables: UtilsAssistForeverGraphicsDB
 ## SavedVariablesPerCharacter: UtilsAssistForeverDB
+
+Libs/LibStub/LibStub.lua
+Libs/LibCustomGlow-1.0/LibCustomGlow-1.0.lua
 
 Core.lua
 Services/Config.lua
@@ -16,8 +19,10 @@ Services/NextSwing.lua
 Services/Range.lua
 Services/Buttons.lua
 Services/IconTint.lua
+Services/QueuedGlow.lua
 Services/Cooldown.lua
 Features/RangeCheck.lua
+Features/QueuedAttackGlow.lua
 Features/CooldownGrey.lua
 Features/BarClickThrough.lua
 Services/SettingsWidgets.lua

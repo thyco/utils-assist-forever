@@ -1,6 +1,6 @@
 local addonName, addon = ...
 addon.name = addonName
-addon.version = "0.4.5"
+addon.version = "0.5.1"
 addon.features = {}
 addon.started = false
 addon.running = false
@@ -15,8 +15,12 @@ function addon:Start()
     end
 
     self.started = true
-    self.Config.Subscribe(function()
-        self:ApplySettings()
+    self.Config.Subscribe(function(key)
+        if key == "queuedGlowColor" or key == "queuedGlowNativeColor" then
+            self.QueuedGlow.SetColor()
+        else
+            self:ApplySettings()
+        end
     end)
     self:ApplySettings()
 end
