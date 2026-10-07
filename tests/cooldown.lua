@@ -105,6 +105,42 @@ test('secret duration curve result can grey without inspecting the duration', fu
     grey(world.main)
 end)
 
+test('secret cooldown stays grey through its final second without a GCD flag', function()
+    local remaining = 1
+    local world = setup(function(w)
+        w.cooldowns[1] = { startTime = 10, duration = 8, isEnabled = true }
+        w.env.Enum.LuaCurveType = { Step = 'step' }
+        w.env.C_CurveUtil = { CreateCurve = function()
+            return {
+                SetType = function() end,
+                AddPoint = function(self, point, result)
+                    if result == 1 then
+                        self.threshold = point
+                    end
+                end,
+            }
+        end }
+        w.env.C_ActionBar.GetActionCooldownDuration = function(slot, ignoreGCD)
+            equal(slot, 1)
+            equal(ignoreGCD, true)
+
+            return {
+                HasSecretValues = function() return true end,
+                EvaluateRemainingDuration = function(_, step)
+                    return remaining >= step.threshold and 1 or 0
+                end,
+            }
+        end
+    end)
+    grey(world.main)
+
+    remaining = 0
+    world:fire('SPELL_UPDATE_COOLDOWN')
+    world:tick(0.1)
+
+    native(world.main)
+end)
+
 test('opaque curve result is reapplied without comparing it', function()
     local world = setup(function(w)
         w.cooldowns[1] = { isOnGCD = false, isEnabled = true }

@@ -136,8 +136,9 @@ local function durationActive(api, id, info)
     end
 
     if Client.Boolean(secret) == true and type(duration.EvaluateRemainingDuration) == "function" then
-        local threshold = info and Client.Boolean(info.isOnGCD) == false and 0.001 or 1.881
-        local step = curve(threshold)
+        -- The duration API was called with ignoreGCD=true, so a real cooldown
+        -- can stay grey until it expires even without readable GCD metadata.
+        local step = curve(0.001)
         if step then
             local ok, value = pcall(duration.EvaluateRemainingDuration, duration, step)
             if ok then
