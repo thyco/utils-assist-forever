@@ -198,6 +198,19 @@ test('unchanged range polls do not rewrite icon textures', function()
     equal(world.bookReads, bookReads, 'spellbook is not rescanned by polling')
 end)
 
+test('range diagnostics are collected only when requested', function()
+    local world, addon = setup()
+
+    equal(addon.Range.checks, nil)
+    world:tick(0.1)
+    equal(addon.Range.checks, nil)
+
+    world.env.SlashCmdList.UTILSASSISTFOREVER('')
+
+    assert(addon.Range.checks[10])
+    assert(table.concat(world.messages, '\n'):find('spellbook=', 1, true))
+end)
+
 test('range checks read each visible action once per refresh', function()
     local reads = {}
     local world = setup(function(w)

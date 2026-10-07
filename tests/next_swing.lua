@@ -81,6 +81,18 @@ test('macro body finds queued attack behind another displayed melee spell', func
     equal(w.queries[2973], nil)
 end)
 
+test('next-swing explanations are collected only for diagnostics', function()
+    local w, addon = setup()
+
+    equal(addon.RangeCheck.references, nil)
+    w:tick(0.1)
+    equal(addon.RangeCheck.references, nil)
+
+    w.env.SlashCmdList.UTILSASSISTFOREVER('')
+
+    assert(addon.RangeCheck.references[1]:find('macro body', 1, true))
+end)
+
 test('direct raptor strike uses auto attack even when harmfulness excludes it', function()
     local w = setup(function(w) w.actions[1] = { 'spell', 2973 } end)
 

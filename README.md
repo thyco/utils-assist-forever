@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.4.3 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.4.4 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.4.3.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.4.4.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -99,7 +99,7 @@ The reference uses the same spellbook-first API and spell-ID fallback, once per 
 
 ## Diagnostics
 
-Run `/uaf` for the current unit, enabled categories, button counts, each checked spell's category/range metadata and the status of both range APIs. For next-swing buttons, diagnostics identify the action slot, whether recognition came from the macro body or displayed/direct spell, and the selected reference spell’s API statuses. Diagnostics use safe text status labels and do not print restricted values or raw errors. When both categories are disabled, stale range checks are not printed.
+Run `/uaf` for the current unit, enabled categories, button counts, each checked spell's category/range metadata and the status of both range APIs. For next-swing buttons, diagnostics identify the action slot, whether recognition came from the macro body or displayed/direct spell, and the selected reference spell’s API statuses. Diagnostic records and explanations are built only for `/uaf`, not on every range poll. Diagnostics use safe text status labels and do not print restricted values or raw errors. When both categories are disabled, stale range checks are not printed.
 
 ## Development
 

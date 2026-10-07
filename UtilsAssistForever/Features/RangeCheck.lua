@@ -1,5 +1,5 @@
 local _, addon = ...
-local feature = { buttons = {}, colored = 0, references = {} }
+local feature = { buttons = {}, colored = 0 }
 addon.RangeCheck = feature
 
 function feature:Enabled()
@@ -18,9 +18,11 @@ function feature:Refresh(discover, rebuild)
         end
     end
 
-    addon.Range:BeginUpdate()
+    local diagnostics = self.diagnoseNext
+    self.diagnoseNext = false
+    addon.Range:BeginUpdate(diagnostics)
     self.colored = 0
-    self.references = {}
+    self.references = diagnostics and {} or nil
     for _, button in ipairs(self.buttons) do
         local outOfRange = false
         if addon.Range.hasTarget and addon.Client.Boolean(button:IsVisible()) == true then
@@ -30,8 +32,10 @@ function feature:Refresh(discover, rebuild)
                 kind, id, subtype)
             if queued then
                 outOfRange = addon.Range:IsMeleeOutOfRange()
-                self.references[#self.references + 1] = "Action slot " .. button.action
-                    .. ": " .. source .. " -> next-swing spell " .. queued .. " -> " .. addon.NextSwing.referenceLabel
+                if diagnostics then
+                    self.references[#self.references + 1] = "Action slot " .. button.action
+                        .. ": " .. source .. " -> next-swing spell " .. queued .. " -> " .. addon.NextSwing.referenceLabel
+                end
             elseif not suppress then
                 local spellID = addon.Client.ActionSpell(kind, id, subtype)
                 outOfRange = addon.Range:IsOutOfRange(spellID)
@@ -46,7 +50,7 @@ function feature:Refresh(discover, rebuild)
 end
 
 function feature:Stop()
-    self.references = {}
+    self.references = nil
     addon.IconTint.Clear()
     self.colored = 0
 end

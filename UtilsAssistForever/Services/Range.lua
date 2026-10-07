@@ -1,5 +1,5 @@
 local _, addon = ...
-local Range = { spells = {}, samples = {}, checks = {} }
+local Range = { spells = {}, samples = {} }
 addon.Range = Range
 local UNKNOWN = {}
 
@@ -23,9 +23,9 @@ function Range:Rebuild()
     end
 end
 
-function Range:BeginUpdate()
+function Range:BeginUpdate(diagnostics)
     self.samples = {}
-    self.checks = {}
+    self.checks = diagnostics and {} or nil
     self.referenceRequested = false
     self.unit = addon.Client.RangeUnit()
     self.hasTarget = self.unit ~= nil
@@ -64,7 +64,9 @@ function Range:Sample(spell)
     if value == nil then
         local source, bookStatus, idStatus
         value, source, bookStatus, idStatus = addon.Client.InRange(spell.id, spell.slot, spell.bank, self.unit)
-        self.checks[spell.id] = { spell = spell, source = source, book = bookStatus, spellID = idStatus }
+        if self.checks then
+            self.checks[spell.id] = { spell = spell, source = source, book = bookStatus, spellID = idStatus }
+        end
         if value == nil then
             value = UNKNOWN
         end
@@ -83,13 +85,14 @@ function Range:DescribeChecks()
 
     local lines = { "Checking: " .. self.unit .. " (living, attackable)" }
     local ids = {}
-    for id in pairs(self.checks) do
+    local checks = self.checks or {}
+    for id in pairs(checks) do
         ids[#ids + 1] = id
     end
     table.sort(ids)
 
     for _, id in ipairs(ids) do
-        local check = self.checks[id]
+        local check = checks[id]
         local spell = check.spell
         local details = spell.reference and "melee reference" or (spell.category .. ", "
             .. spell.minRange .. "-" .. spell.maxRange .. " yd metadata")

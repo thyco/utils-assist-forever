@@ -120,6 +120,9 @@ SlashCmdList.UTILSASSISTFOREVER = function(message)
         return
     end
 
+    if addon.RangeCheck:Enabled() then
+        addon.RangeCheck.diagnoseNext = true
+    end
     addon:Refresh(true, true)
     print("Utils Assist Forever " .. addon.version .. " | /uaf config to configure")
     print("Ranged: " .. (addon.Config.Get("checkRangedAbilities") and "enabled" or "disabled")
@@ -136,7 +139,7 @@ SlashCmdList.UTILSASSISTFOREVER = function(message)
     end
     print("Click-through bars: " .. (#clickThrough > 0 and table.concat(clickThrough, ", ") or "none"))
     if addon.RangeCheck:Enabled() then
-        for _, line in ipairs(addon.RangeCheck.references) do
+        for _, line in ipairs(addon.RangeCheck.references or {}) do
             print(line)
         end
         for _, line in ipairs(addon.Range:DescribeChecks()) do
