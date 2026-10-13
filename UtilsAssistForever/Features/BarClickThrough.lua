@@ -15,7 +15,7 @@ function feature:Enabled()
 end
 
 local function setMouse(button, enabled)
-    if InCombatLockdown() or type(button.EnableMouse) ~= "function" then
+    if not button or InCombatLockdown() or type(button.EnableMouse) ~= "function" then
         return false
     end
 
@@ -30,6 +30,8 @@ end
 
 function feature:Discover()
     self.buttons = {}
+    self.mainBar = MainActionBar
+
     for barIndex = 1, 8 do
         for _, button in ipairs(addon.Buttons.Bar(barIndex)) do
             self.buttons[#self.buttons + 1] = { button = button, barIndex = barIndex }
@@ -39,6 +41,8 @@ end
 
 function feature:ApplyMouse()
     local shiftHeld = Client.Boolean(Client.Read(IsShiftKeyDown)) == true
+
+    setMouse(self.mainBar, shiftHeld or not addon.Config.Get("clickThroughBar1"))
 
     for _, entry in ipairs(self.buttons) do
         local enabled = shiftHeld or not addon.Config.Get("clickThroughBar" .. entry.barIndex)
@@ -94,6 +98,8 @@ function feature:Refresh(discover)
 end
 
 function feature:Stop()
+    setMouse(self.mainBar, true)
+
     for _, entry in ipairs(self.buttons) do
         setMouse(entry.button, true)
     end

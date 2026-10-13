@@ -15,6 +15,7 @@ end
 
 local function setup(configure)
     local world = H.new()
+    world.mainBar = world.env.CreateFrame('Frame', 'MainActionBar', world.env.UIParent)
     world.main = world:button('ActionButton1', 1)
     world.side = world:button('MultiBarBottomLeftButton1', 61)
     world.actions[1] = { 'macro', 10, 'spell' }
@@ -54,6 +55,7 @@ end
 test('selected bar becomes click-through and other bars stay clickable', function()
     local world = setup()
 
+    equal(world.mainBar.mouseEnabled, false)
     equal(world.main.mouseEnabled, false)
     equal(world.side.mouseEnabled, true)
 end)
@@ -63,12 +65,14 @@ test('holding Shift temporarily restores clicks without changing the saved bar c
 
     world:holdShift(true)
 
+    equal(world.mainBar.mouseEnabled, true)
     equal(world.main.mouseEnabled, true)
     equal(world.side.mouseEnabled, true)
     equal(world.env.UtilsAssistForeverDB.clickThroughBar1, true)
 
     world:holdShift(false)
 
+    equal(world.mainBar.mouseEnabled, false)
     equal(world.main.mouseEnabled, false)
     equal(world.side.mouseEnabled, true)
 end)
@@ -229,11 +233,13 @@ test('click-through setting changed during combat applies after combat', functio
     local world, addon = setup()
     world.combat = true
     addon.Config.Set('clickThroughBar1', false)
+    equal(world.mainBar.mouseEnabled, false)
     equal(world.main.mouseEnabled, false)
 
     world.combat = false
     world:fire('PLAYER_REGEN_ENABLED')
 
+    equal(world.mainBar.mouseEnabled, true)
     equal(world.main.mouseEnabled, true)
 end)
 

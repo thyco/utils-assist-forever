@@ -2,7 +2,7 @@
 ## Title: Utils Assist Forever
 ## Notes: Range, cooldown, queued-attack glow and action-bar click-through utilities for WoW Forever.
 ## Author: Utils Assist Forever
-## Version: 0.5.1
+## Version: 0.5.2
 ## IconTexture: Interface\AddOns\UtilsAssistForever\Media\icon.tga
 ## SavedVariables: UtilsAssistForeverGraphicsDB
 ## SavedVariablesPerCharacter: UtilsAssistForeverDB

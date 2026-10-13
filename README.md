@@ -1,10 +1,10 @@
 # Utils Assist Forever
 
-A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Queued next-swing attacks gain a bright moving border. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.5.1 targets interface **16001**.
+A home for class-independent WoW Forever utilities. Range checks tint spell icons **desaturated red when WoW explicitly reports them out of range**. Queued next-swing attacks gain a bright moving border. Cooldown checks grey actions on a real cooldown or when WoW reports them unusable. Action-bar click-through can disable mouse clicks on chosen bars. A graphics control adjusts grass and ground-effect density. Supports every class and all eight default Blizzard action bars. Version 0.5.2 targets interface **16001**.
 
 ## Install
 
-Extract `dist/UtilsAssistForever-0.5.1.zip` into `Interface/AddOns`, producing:
+Extract `dist/UtilsAssistForever-0.5.2.zip` into `Interface/AddOns`, producing:
 
 ```text
 Interface/AddOns/UtilsAssistForever/UtilsAssistForever.toc
@@ -34,7 +34,7 @@ The **Cooldown greying** group contains four checkboxes:
 - **Grey actions without resources** — disabled by default; extends unusable greying to insufficient resources.
 - **Grey pet actions** — enabled by default.
 
-The **Action bar click-through** group contains one checkbox for each of the eight default bars. All are off by default, so bars remain clickable. Enabling a checkbox disables mouse clicks on that bar; key bindings still work. Hold Shift outside combat to temporarily click, move spells or view tooltips on selected bars. Releasing Shift restores each bar's saved choice. Changes made during combat are saved immediately and applied when combat ends.
+The **Action bar click-through** group contains one checkbox for each of the eight default bars. All are off by default, so bars remain clickable. Enabling a checkbox disables mouse clicks on that bar; key bindings still work. Bar 1 also makes Blizzard's mouse-enabled main-bar frame click-through, allowing mouse drags over it to reach the world camera. Hold Shift outside combat to temporarily click, move spells or view tooltips on selected bars. Releasing Shift restores each bar's saved choice. Changes made during combat are saved immediately and applied when combat ends.
 
 The **Graphics settings** group contains **Grass & ground-effect density** and its own **Reset to default** button. The slider adjusts WoW's `groundEffectDensity` CVar from 16 to 256 in steps of 8. The displayed current value is read back from the client. Reset restores the default reported by this client for that CVar alone; no default number is hard-coded. The controls are disabled when the CVar is absent, locked, read-only or unavailable for writing in combat. A manual override is reapplied after login and after Blizzard's Ground Clutter preset changes. Until a value is chosen or reset, the addon leaves the client's existing graphic setting alone.
 
@@ -138,7 +138,7 @@ Local tests cannot establish actual Forever spell metadata, rendering or secure 
 6. Check target priority, target clearing, enemy mouseover arrival/departure, and selected friendly/dead targets blocking mouseover fallback.
 7. Repeat in combat and watch for Lua errors or blocked-action messages. Verify unknown/restricted range checks restore the native icon.
 8. Test a real cooldown, a global cooldown, an unusable action, insufficient resources, and a pet action. Toggle each cooldown setting and confirm normal icon color returns after the cooldown. Check a spell that is both out of range and on cooldown: it should be red first, then grey when range becomes valid.
-9. Enable click-through on one bar and confirm mouse clicks pass through while key bindings still activate abilities. Put a macro with combat and no-combat spell branches on that bar; its icon should switch on both combat transitions without hovering over it. Check paging and a different bar left clickable. Toggle click-through during combat and confirm the mouse change applies when combat ends.
+9. Enable click-through on bar 1, start a left-mouse drag over its action buttons, and confirm the camera turns as it does over the world; compare with another selected bar. Hold Shift and confirm bar 1 becomes clickable for moving spells and viewing tooltips, then release it and repeat the camera drag. Key bindings should still activate abilities. Put a macro with combat and no-combat spell branches on a selected bar; its icon should switch on both combat transitions without hovering over it. Check paging and a different bar left clickable. Toggle click-through during combat and confirm the mouse change applies when combat ends.
 10. In Graphics settings, change grass and ground-effect density, reload and confirm the value persists. Change Blizzard's Ground Clutter preset and confirm the manual density returns. Press this setting's Reset button and confirm the displayed value returns to the client's reported default without changing other graphic settings. Repeat on another character to confirm the graphic choice is account-wide.
 11. Queue a Heroic Strike, Cleave, Raptor Strike or Maul on a default bar. Confirm the moving border follows Blizzard's original checked indicator, including when the queued attack is cancelled or consumed. Change its color with the Blizzard picker, then select the native-color option and confirm the built-in yellow appearance. Test the `/cast [combat] Heroic Strike; Shoot Bow` macro as combat starts and ends, and verify that disabling the highlight setting removes only the extra glow. Repeat during combat and watch for blocked-action messages.
 
